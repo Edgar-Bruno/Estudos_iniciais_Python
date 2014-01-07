@@ -16,16 +16,16 @@ class  ediThread(threading.Thread):
 		self.amount_completed = 0
 		gobject.timeout_add(1, self.ativar_barra)
 
-		for i in range(10):
+		for i in range(100):
 			time.sleep(0.15)
-			self.amount_completed += .1
+			self.amount_completed += .01
 
 		self.work_complete = True
 
 	def ativar_barra(self):
 		print self.amount_completed
 		self.mainviewEdi.barra_progresso.set_fraction(self.amount_completed)
-		self.mainviewEdi.textoLabel.set_text("eddfdfdf")
+		self.mainviewEdi.textoLabel.set_text("Valor da atualização %f" % self.amount_completed)
 
 		if self.work_complete:
 			self.mainviewEdi.barra_progresso.set_text("Completo")
