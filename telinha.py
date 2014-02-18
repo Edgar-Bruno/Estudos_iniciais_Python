@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import threading, gtk, pygtk, commands, subprocess, urllib2, os, threading, time, gobject, pango
+import threading, gtk,\
+pygtk, commands, subprocess,\
+urllib2, os, threading, time, gobject, pango
 
 pygtk.require('2.0')
 
@@ -53,6 +55,7 @@ class BaseY:
 		self.textoLabel.set_tooltip_text("Esse e o texo do botao\n ESCONDER")
 
 		self.janelinha.set_title("Titulo do programinha ESCONDER")
+		os.system("gedit")
 
 	def exibir(self, widget):
 		print "Ola Vivi !!!"
@@ -66,15 +69,21 @@ class BaseY:
 
 	def textMudar(self, widget):
 		#self.textoLabel.set_text("A entrada foi mudada")
-		#var = subprocess.call(['ls']) Aqui será exibido  a saida do comando [0] =sem erros
-		self.textoLabel.set_text(str(check_output(['ls','../'])))
-		#print var
+		#var = subprocess.call(['ls']) #Aqui será exibido  a saida do comando [0] =sem erros
+		#self.textoLabel.set_text(str(check_output(['ls','../'])))
+		
 		#self.textMudar.set_tooltip_text("Digite o que voce quiser aqui")
+		var = "edgarar"
+		print var
+		self.textoLabel.set_text(str(var))
+
+
 
 	def limparTXT(self, widget):
 		self.textoEntrada.set_text("")
 	
-		#teste = Popen("sudo apt-get purge gedit")
+		os.system("apt-get -y purge gedit")
+		#teste = popen("sudo apt-get purge gedit")
 
 	def comboBox_text(self, widget):
 		self.textoEntrada.set_text(widget.get_active_text())
@@ -96,7 +105,7 @@ class BaseY:
 		img = open("salvar.png", "w")
 		img.write(figura.read())
 		img.close()
-		#os.system("apt-get -y install gedit")
+		os.system("apt-get -y install gedit")
 
 	def infoSobre(self, widget):
 		self.barra_progresso.set_text("Virginia Bruno")
