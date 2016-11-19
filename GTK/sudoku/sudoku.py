@@ -1,12 +1,33 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Projeto de estudo de Python e criar um jogo bem legal.
 
+from random import randint
 import gtk
 
 # Função responsável pela sequência de números para criar o jogo 
 def criarMatriz():
 
 	vaux = False
+	numeroSorteado = None
+	listaNumeros = []
+	
+	while not vaux:
+		
+		numeroSorteado = randint(1,9)
+
+		if numeroSorteado not in listaNumeros:
+			listaNumeros.append(numeroSorteado)
+			print listaNumeros
+		else:
+			print "não"
+
+		if len(listaNumeros) == 9:
+			vaux = True
+
+
+	print listaNumeros
+	return listaNumeros
 
 #Cria o objeto win
 win = gtk.Window()
@@ -22,7 +43,7 @@ tableJogo = gtk.Table(10,10, gtk.TRUE)
 
 
 
-a = makeMatriz()
+a = criarMatriz()
 
 x = 0
 y = 0
@@ -41,6 +62,6 @@ for i in a:
 
 box.pack_start(tableJogo)
 
-win.show_all()
+#win.show_all()
 
-gtk.main()
+#gtk.main()
