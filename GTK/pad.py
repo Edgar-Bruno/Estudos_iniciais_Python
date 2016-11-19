@@ -2,6 +2,14 @@
 
 import gtk
 
+def click_btn(widget):
+	num = entry.get_text()
+	cnum = widget.get_label()
+	entry.set_text(num + cnum)
+
+def click_env(widget):
+	print "Discando..." + entry.get_text()
+
 #Cria o objeto win
 win = gtk.Window()
 
@@ -13,7 +21,9 @@ box = gtk.VBox()
 win.add(box)
 
 entry = gtk.Entry()
-box.pack_start(entry)
+
+#Este "False" serve para fixar o campo entry quando a caixa de dialogo for maximizada
+box.pack_start(entry, False)
 
 table = gtk.Table(2,2, gtk.TRUE)
 
@@ -24,6 +34,9 @@ y = 0
 
 for i in a:
     button = gtk.Button(str(i))
+
+    button.connect("clicked", click_btn)
+
     table.attach(button, x, x+1, y, y+1)
 
     x += 1
@@ -31,7 +44,12 @@ for i in a:
     	x = 0
     	y += 1
 
+enviar_btn = gtk.Button("ENVIAR")
+enviar_btn.connect("clicked", click_env)
+
 box.pack_start(table)
+box.pack_start(enviar_btn)
+
 
 win.show_all()
 
