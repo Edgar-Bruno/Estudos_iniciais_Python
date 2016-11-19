@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+# Exemplos de utilização do gtk
+
+# referencias
+# http://www.pygtk.org/pygtk2reference/class-gtkvbox.html
 
 import gtk
 
@@ -17,7 +21,7 @@ win = gtk.Window()
 win.connect('destroy', lambda w: gtk.main_quit())
 
 
-box = gtk.VBox()
+box = gtk.VBox(homogeneous=True, spacing=0)
 win.add(box)
 
 entry = gtk.Entry()
