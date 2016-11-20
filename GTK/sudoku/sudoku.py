@@ -26,7 +26,7 @@ def criarMatriz():
 	numeroSorteado = None
 	listaNumeros = [] # Cria uma lista com 11 números após, ser inserida em listaMatriz seu valor é resetado
 	listaMatriz = [] # Recebe todos números da listaNumeros
-	limpaListaNumeros = 0 # Mecanismo para impedir loops infinitos
+	quebraLoopInfinito = 0 # Mecanismo para impedir loops infinitos
 
 
 	while not vaux:
@@ -42,20 +42,25 @@ def criarMatriz():
 			# Aqui é criado um 'espaço horizontal' entre os 'quatrandes' do jogo
 			listaMatriz.extend([0]*11)
 			vauxH = 0
-			vaux = True
 			
 		if numeroSorteado not in listaNumeros:
+			# Primeira verificação de repetição dos números no eixo X
 			listaNumeros.append(numeroSorteado)
+
 			if not ordenadas(listaMatriz, numeroSorteado, len(listaNumeros)):
 				vauxV += 1
-				limpaListaNumeros = 0
+				quebraLoopInfinito = 0
 			else:
 				listaNumeros.remove(listaNumeros[-1])
-				if limpaListaNumeros == 20:
+				if quebraLoopInfinito == 50:
+				
 					listaNumeros = []
 					vauxV = 0
-				limpaListaNumeros += 1
-				print " %d  -> %d " % (limpaListaNumeros, numeroSorteado)
+					quebraLoopInfinito = 0
+					
+				quebraLoopInfinito += 1
+
+				print " %d  -> %d " % (quebraLoopInfinito, numeroSorteado)
 
 		if len(listaNumeros) == 11:
 			listaMatriz.extend(listaNumeros)
@@ -63,6 +68,9 @@ def criarMatriz():
 			listaNumeros = []
 			vauxV = 0
 			vauxH += 1
+
+		if len(listaMatriz) > 120:
+			vaux = True
 
 	return listaMatriz
 
