@@ -16,6 +16,47 @@ def ordenadas(listaMatriz, numeroSorteado, indexListaNumeros):
 
 	return numeroSorteado in listaMatriz[indexListaNumeros::11]
 
+def quadrante(listaMatriz, numeroSorteado, indexMatriz, listaNumeros):
+
+	#listaMatrizTMP = []
+	listaMatrizTMP = listaMatriz + listaNumeros[:-1]
+
+	print "listaMatrizTMP >>>>> ", listaMatrizTMP
+
+	posFix = [0, 4 , 8 , 44, 48, 52, 88, 92, 96]
+	inIndex = None
+	quadMontado = []
+	#indexMatriz = 119
+
+	y = 0
+
+	for i in posFix:
+		z = 0
+		validarQuad =[]
+		for x in range(9):
+			validarQuad.append(i+z)
+			z += 1
+			y += 1
+
+			if y > 2:
+				y = 0
+				z += 8
+
+		if indexMatriz in validarQuad:
+			inIndex = i
+			break
+	z = 0
+	for i in range(3):
+		print "VALORES ", listaMatrizTMP[inIndex+z:inIndex+3+z]
+		quadMontado.extend(listaMatrizTMP[inIndex+z:inIndex+3+z])
+		z += 11
+
+	print "$$$$$$$$$$$$$$$", numeroSorteado
+	print "$$$$$$$$$$$$$$$", quadMontado
+	print "$$$$$$$$$$$$$$$", numeroSorteado in quadMontado
+
+	return numeroSorteado in quadMontado
+
 def criarMatriz():
 	# Função responsável pela sequência de números para criar o jogo 
 
@@ -46,13 +87,20 @@ def criarMatriz():
 		if numeroSorteado not in listaNumeros:
 			# Primeira verificação de repetição dos números no eixo X
 			listaNumeros.append(numeroSorteado)
+	
 
-			if not ordenadas(listaMatriz, numeroSorteado, len(listaNumeros)):
+			if not quadrante(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros)-1, listaNumeros):
+			#if not ordenadas(listaMatriz, numeroSorteado, len(listaNumeros)):
+				#print quadrante(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros)-1, listaNumeros)
+				print "***********************"
+				print "listaMatriz    >>>>> ", listaMatriz
+				print "***********************"
+
 				vauxV += 1
 				quebraLoopInfinito = 0
 			else:
 				listaNumeros.remove(listaNumeros[-1])
-				if quebraLoopInfinito == 50:
+				if quebraLoopInfinito == 2000:
 				
 					listaNumeros = []
 					vauxV = 0
@@ -60,18 +108,20 @@ def criarMatriz():
 					
 				quebraLoopInfinito += 1
 
-				print " %d  -> %d " % (quebraLoopInfinito, numeroSorteado)
+				#print " %d  -> %d " % (quebraLoopInfinito, numeroSorteado)
 
 		if len(listaNumeros) == 11:
 			listaMatriz.extend(listaNumeros)
-			print listaNumeros
+			
 			listaNumeros = []
 			vauxV = 0
 			vauxH += 1
 
 		if len(listaMatriz) > 120:
+			# Finzalia o while ao atingir a quantidade de números necessários para criar o jogo
 			vaux = True
 
+	print listaMatriz
 	return listaMatriz
 
 #Cria o objeto win
@@ -86,21 +136,7 @@ win.add(box)
 
 tableJogo = gtk.Table(10,10, gtk.TRUE)
 
-
 a = criarMatriz()
-
-"""a = [8, 9, 6, 0, 5, 3, 1, 0, 7, 2, 4,
-3, 4, 7, 0, 8, 9, 6, 0, 2, 5, 1,
-2, 3, 8, 0, 5, 9, 6, 0, 1, 4, 7,
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-5, 2, 6, 0, 3, 1, 7, 0, 9, 8, 4,
-2, 4, 3, 0, 1, 9, 5, 0, 8, 7, 6,
-9, 2, 5, 0, 3, 6, 4, 0, 8, 1, 7,
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-8, 2, 5, 0, 6, 9, 3, 0, 1, 4, 7,
-2, 3, 8, 0, 7, 1, 6, 0, 5, 9, 4,
-5, 4, 3, 0, 7, 6, 9, 0, 8, 2, 1]"""
-
 x = 0
 y = 0
 
