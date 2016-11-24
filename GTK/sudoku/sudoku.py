@@ -5,6 +5,20 @@
 from random import randint
 import gtk
 
+def abscissas(listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
+
+	i = indexMatriz
+
+	if not listaNumeros:
+
+		while i % 11 != 0:
+			i -= 1
+
+		listaNumeros = listaMatriz[i:i+11]
+
+	return numeroSorteado in listaNumeros
+
+
 def ordenadas(listaMatriz, numeroSorteado, indexListaNumeros):
 	# verifica se a ocorrência de números repetidos no eixo Y
 
@@ -16,7 +30,7 @@ def ordenadas(listaMatriz, numeroSorteado, indexListaNumeros):
 
 	return numeroSorteado in listaMatriz[indexListaNumeros::11]
 
-def quadrante(listaMatriz, numeroSorteado, indexMatriz, listaNumeros):
+def quadrante(listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
 
 	listaMatrizTMP = listaMatriz + listaNumeros[:-1]
 
@@ -79,6 +93,8 @@ def criarMatriz():
 			
 		if numeroSorteado not in listaNumeros:
 			# Primeira verificação de repetição dos números no eixo X
+
+			print abscissas(listaMatriz, numeroSorteado, len(listaNumeros), listaNumeros)
 			listaNumeros.append(numeroSorteado)
 	
 			checkRepeti =[] # Recebe booleano de repetição ods números no eixo Y e no quadrante
