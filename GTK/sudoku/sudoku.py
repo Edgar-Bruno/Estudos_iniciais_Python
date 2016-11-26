@@ -3,13 +3,13 @@
 # Projeto de estudo de Python e criar um jogo bem legal.
 
 from random import randint
-import gtk
+import gtk, os
 
 def abscissas(listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
 
 	i = indexMatriz
 
-	if not listaNumeros:
+	if not listaNumeros and not listaMatriz:
 
 		while i % 11 != 0:
 			i -= 1
@@ -18,21 +18,21 @@ def abscissas(listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
 
 	return numeroSorteado in listaNumeros
 
-
 def ordenadas(listaMatriz, numeroSorteado, indexListaNumeros):
 	# verifica se a ocorrência de números repetidos no eixo Y
 
-	if indexListaNumeros == 1:
-
-		indexListaNumeros = 0
-	else:
-		indexListaNumeros -= 1
+	"""if indexListaNumeros == 1:
+			
+					indexListaNumeros = 0
+					
+				else:
+					indexListaNumeros -= 1"""
 
 	return numeroSorteado in listaMatriz[indexListaNumeros::11]
 
 def quadrante(listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
 
-	listaMatrizTMP = listaMatriz + listaNumeros[:-1]
+	listaMatrizTMP = listaMatriz + listaNumeros
 
 	posFix = [0, 4 , 8 , 44, 48, 52, 88, 92, 96]
 	inIndex = None
@@ -75,7 +75,7 @@ def criarMatriz():
 	listaNumeros = [] # Cria uma lista com 11 números após, ser inserida em listaMatriz seu valor é resetado
 	listaMatriz = [] # Recebe todos números da listaNumeros
 	quebraLoopInfinito = 0 # Mecanismo para impedir loops infinitos
-
+	resetCriaMatriz = 0 # Mecanismo para "resetar" a um, eventual, loop infinito
 
 	while not vaux:
 		
@@ -90,33 +90,31 @@ def criarMatriz():
 			# Aqui é criado um 'espaço horizontal' entre os 'quatrandes' do jogo
 			listaMatriz.extend([0]*11)
 			vauxH = 0
+		
+		checkRepeti =[] # Recebe booleano de repetição ods números no eixo Y e no quadrante
+		checkRepeti.append(abscissas(listaMatriz, numeroSorteado, len(listaNumeros), listaNumeros))	
+		checkRepeti.append(ordenadas(listaMatriz, numeroSorteado, len(listaNumeros)))
+		checkRepeti.append(quadrante(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros), listaNumeros))
+
+		if True in checkRepeti:
 			
-		if numeroSorteado not in listaNumeros:
-			# Primeira verificação de repetição dos números no eixo X
-
-			print abscissas(listaMatriz, numeroSorteado, len(listaNumeros), listaNumeros)
-			listaNumeros.append(numeroSorteado)
-	
-			checkRepeti =[] # Recebe booleano de repetição ods números no eixo Y e no quadrante
-			checkRepeti.append(ordenadas(listaMatriz, numeroSorteado, len(listaNumeros)))
-			checkRepeti.append(quadrante(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros)-1, listaNumeros))
-
-			if True in checkRepeti:
-
-				listaNumeros.remove(listaNumeros[-1])
-
-				if quebraLoopInfinito == 50:
-				
-					listaNumeros = []
-					vauxV = 0
-					quebraLoopInfinito = 0
-					
-				quebraLoopInfinito += 1
-
-			else:
-
-				vauxV += 1
+			if quebraLoopInfinito == 25:
+				listaNumeros = []
+				vauxV = 0
 				quebraLoopInfinito = 0
+				resetCriaMatriz += 1
+			
+			if resetCriaMatriz == 25:
+				vaux = True
+
+			quebraLoopInfinito += 1
+
+		else:
+
+			listaNumeros.append(numeroSorteado)
+			vauxV += 1
+			quebraLoopInfinito = 0
+
 
 		if len(listaNumeros) == 11:
 			listaMatriz.extend(listaNumeros)
@@ -125,7 +123,7 @@ def criarMatriz():
 			vauxV = 0
 			vauxH += 1
 
-		if len(listaMatriz) > 120:
+		if len(listaMatriz) is 121:
 			# Finzalia o while ao atingir a quantidade de números necessários para criar o jogo
 			vaux = True
 
@@ -143,7 +141,15 @@ win.add(box)
 
 tableJogo = gtk.Table(10,10, gtk.TRUE)
 
-a = criarMatriz()
+a =[None]
+s = 0
+
+while not len(a) == 121:
+	s += 1
+	a = criarMatriz()
+
+print "Tentativa -> " ,s
+
 x = 0
 y = 0
 
