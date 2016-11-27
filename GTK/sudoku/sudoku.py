@@ -37,7 +37,6 @@ def quadrante(listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
 	posFix = [0, 4 , 8 , 44, 48, 52, 88, 92, 96]
 	inIndex = None
 	quadMontado = []
-	#indexMatriz = 119
 
 	y = 0
 
@@ -139,7 +138,7 @@ box = gtk.VBox()
 
 win.add(box)
 
-tableJogo = gtk.Table(10,10, gtk.TRUE)
+tableJogo = gtk.Table(10,10)
 
 a =[None]
 s = 0

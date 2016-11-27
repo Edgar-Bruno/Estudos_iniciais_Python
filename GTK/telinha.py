@@ -136,10 +136,7 @@ class BaseY:
 		self.janelinha.set_position(gtk.WIN_POS_CENTER)
 		self.janelinha.set_size_request(500, 500)
 
-
 		self.janelinha.set_title("Titulo do programinha INICIO")
-
-		
 
 		self.botaoH =gtk.ColorButton(color=gtk.gdk.Color(5,5,0))
 		self.botaoH.set_tooltip_text("Clique e escolha uma cor")
@@ -151,7 +148,6 @@ class BaseY:
 		self.botaoF = gtk.Button("Baixar")
 		self.botaoF.connect('clicked', self.baixar_img)
 		self.botaoF.set_tooltip_text("Aqui será baixado uma imagem de um endereço estático - http://all.hu/tux.jpg")
-
 
 		#self.janelinha.set_tooltip_text("este e o meu programinha\nEdgar\nBruno\nVirginia")
 		self.botaoE = gtk.Button("Sobre")
