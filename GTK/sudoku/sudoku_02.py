@@ -18,11 +18,11 @@ class Aplicacao:
 		self.window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
 		#self.window.set_size_request(550, 550)
 
-		self.create_widgets()
+		self.cria_widgets()
 
 		self.window.show_all()
 
-	def create_widgets(self):
+	def cria_widgets(self):
 
 		self.hbox = gtk.HBox(True, 50)
 		self.table = gtk.Table(3,3, gtk.TRUE)
@@ -40,8 +40,12 @@ class Aplicacao:
 			listaMatriz = self.criarMatriz()
 
 		print "Tentativa -> " ,s
+		print "*****************"
+		print listaMatriz
+		print "*****************"
 
-
+		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
+		dicValores = {}
 
 		for i in posFix:
 			self.table_b = gtk.Table(3,3, gtk.TRUE)
@@ -55,16 +59,28 @@ class Aplicacao:
 
 			z = 0
 			for iq in range(3):
-				quadMontado.extend(listaMatriz[i+z:i+3+z])
-				
+				#quadMontado.extend(listaMatriz[i+z:i+3+z])
+				#print "Valores de [i = %d, z = %d, iq = %d]" % (i, z, iq)
+				#print "********************"
+				for d in range(i+z, i+3+z):
+					#print "Indice = %d Valor = %d" % (d, listaMatriz[d])
+					dicValores[d] = [listaMatriz[d]]
+					quadMontado.append(d)
 				z += 11
-
+			
+			print dicValores
+			print "********************"
+			
 			print quadMontado
+			print "********************"
 
 			for ii in quadMontado:
 				#var = "[%d, %d]" % (i, ii)
 				
-				self.button = gtk.Button(str(ii))
+				self.button = gtk.Button(str(dicValores[ii][0]))
+
+				self.button.connect("clicked", self.click_btn, dicValores, ii)
+				
 				self.table_b.attach(self.button, xx, xx+1, yy, yy+1)
 
 				xx += 1
@@ -83,6 +99,13 @@ class Aplicacao:
 
 
 		self.window.add(self.hbox)
+
+	def click_btn(self, widget, dicValores, id):
+		cnum = widget.get_label()
+		print "Valor = %d, id = %d" % (dicValores[id][0], id)
+		
+		#print cnum
+
 
 	def abscissas(self, listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
 	
