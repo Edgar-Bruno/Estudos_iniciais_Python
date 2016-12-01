@@ -30,19 +30,18 @@ class Aplicacao:
 		x = 0
 		y = 0
 
-		posFix = [0, 4 , 8 , 44, 48, 52, 88, 92, 96]
+		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 
 		listaMatriz =[None]
 		s = 0
 
-		while not len(listaMatriz) == 121:
-			s += 1
+		while not len(listaMatriz) == 81:
 			listaMatriz = self.criarMatriz()
+			s += 1
+			print "Tentativa -> " ,s
 
-		print "Tentativa -> " ,s
 		print "*****************"
-		print listaMatriz
-		print "*****************"
+		#print listaMatriz
 
 		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
 		dicValores = {}
@@ -59,23 +58,18 @@ class Aplicacao:
 
 			z = 0
 			for iq in range(3):
-				#quadMontado.extend(listaMatriz[i+z:i+3+z])
+
 				#print "Valores de [i = %d, z = %d, iq = %d]" % (i, z, iq)
-				#print "********************"
+				#print quadMontado
 				for d in range(i+z, i+3+z):
 					#print "Indice = %d Valor = %d" % (d, listaMatriz[d])
 					dicValores[d] = [listaMatriz[d]]
 					quadMontado.append(d)
-				z += 11
+				z += 9
 			
-			print dicValores
-			print "********************"
-			
-			print quadMontado
-			print "********************"
+			#print quadMontado
 
 			for ii in quadMontado:
-				#var = "[%d, %d]" % (i, ii)
 				
 				self.button = gtk.Button(str(dicValores[ii][0]))
 
@@ -90,6 +84,7 @@ class Aplicacao:
 
 			self.frame.add(self.table_b)
 			self.table.attach(self.frame, x, x+1, y, y+1,xpadding=3, ypadding=3)
+
 			x += 1
 			if x > 2:
 				x = 0
@@ -103,40 +98,34 @@ class Aplicacao:
 	def click_btn(self, widget, dicValores, id):
 		cnum = widget.get_label()
 		print "Valor = %d, id = %d" % (dicValores[id][0], id)
-		
-		#print cnum
 
 
-	def abscissas(self, listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
-	
+	def abscissas(self, listaMatriz, numeroSorteado, indexMatriz):
+		# verifica se a ocorrência de números repetidos no eixo X
+		#lado esquedo
+
 		i = indexMatriz
+		
+		while i % 9 != 0:
+			i -= 1
 
-		if not listaNumeros and not listaMatriz:
-
-			while i % 11 != 0:
-				i -= 1
-
-			listaNumeros = listaMatriz[i:i+11]
-
-		return numeroSorteado in listaNumeros
-
-	def ordenadas(self, listaMatriz, numeroSorteado, indexListaNumeros):
+		return numeroSorteado in listaMatriz[i:i+9]
+	
+	def ordenadas(self, listaMatriz, numeroSorteado, indexMatriz):
 		# verifica se a ocorrência de números repetidos no eixo Y
+		#Sobe
 
-		"""if indexListaNumeros == 1:
-				
-						indexListaNumeros = 0
-						
-					else:
-						indexListaNumeros -= 1"""
+		i = indexMatriz
+		while i >= 9:
+			i -= 9
 
-		return numeroSorteado in listaMatriz[indexListaNumeros::11]
+		return numeroSorteado in listaMatriz[i::9]
 
 	def quadrante(self, listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
 
 		listaMatrizTMP = listaMatriz + listaNumeros
 
-		posFix = [0, 4 , 8 , 44, 48, 52, 88, 92, 96]
+		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 		inIndex = None
 		quadMontado = []
 
@@ -146,14 +135,17 @@ class Aplicacao:
 			z = 0
 			validarQuad =[]
 			for x in range(9):
+
+				#print "AQUI", numeroSorteado
 				validarQuad.append(i+z)
 				z += 1
 				y += 1
 
 				if y > 2:
 					y = 0
-					z += 8
+					z += 6
 
+			#print validarQuad
 			if indexMatriz in validarQuad:
 				inIndex = i
 				break
@@ -161,7 +153,8 @@ class Aplicacao:
 
 		for i in range(3):
 			quadMontado.extend(listaMatrizTMP[inIndex+z:inIndex+3+z])
-			z += 11
+
+			z += 9
 
 		return numeroSorteado in quadMontado
 
@@ -169,8 +162,6 @@ class Aplicacao:
 		# Função responsável pela sequência de números para criar o jogo 
 
 		vaux = False
-		vauxV = 0
-		vauxH = 0
 
 		numeroSorteado = None
 		listaNumeros = [] # Cria uma lista com 11 números após, ser inserida em listaMatriz seu valor é resetado
@@ -181,52 +172,40 @@ class Aplicacao:
 		while not vaux:
 			
 			numeroSorteado = randint(1,9)
-
-			if vauxV == 3:
-				# Aqui é criado um 'espaço vertical' entre os 'quatrandes' do jogo
-				listaNumeros.append(0)
-				vauxV = 0
-
-			if vauxH == 3:
-				# Aqui é criado um 'espaço horizontal' entre os 'quatrandes' do jogo
-				listaMatriz.extend([0]*11)
-				vauxH = 0
-			
+	
 			checkRepeti =[] # Recebe booleano de repetição ods números no eixo Y e no quadrante
-			checkRepeti.append(self.abscissas(listaMatriz, numeroSorteado, len(listaNumeros), listaNumeros))	
-			checkRepeti.append(self.ordenadas(listaMatriz, numeroSorteado, len(listaNumeros)))
+			checkRepeti.append(self.abscissas(listaNumeros, numeroSorteado, len(listaNumeros)))
+			checkRepeti.append(self.ordenadas(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros)))	
 			checkRepeti.append(self.quadrante(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros), listaNumeros))
 
+			#print checkRepeti
+
 			if True in checkRepeti:
-				
+
 				if quebraLoopInfinito == 25:
 					listaNumeros = []
-					vauxV = 0
 					quebraLoopInfinito = 0
 					resetCriaMatriz += 1
 				
-				if resetCriaMatriz == 25:
-					vaux = True
+					if resetCriaMatriz == 25:
+						vaux = True
 
 				quebraLoopInfinito += 1
 
 			else:
 
 				listaNumeros.append(numeroSorteado)
-				vauxV += 1
 				quebraLoopInfinito = 0
 
+				if len(listaNumeros) == 9:
 
-			if len(listaNumeros) == 11:
-				listaMatriz.extend(listaNumeros)
-				
-				listaNumeros = []
-				vauxV = 0
-				vauxH += 1
+					listaMatriz.extend(listaNumeros)
+					listaNumeros = []
 
-			if len(listaMatriz) is 121:
-				# Finzalia o while ao atingir a quantidade de números necessários para criar o jogo
-				vaux = True
+					if len(listaMatriz) is 81:
+
+						# Finzalia o while ao atingir a quantidade de números necessários para criar o jogo	
+						vaux = True
 
 		return listaMatriz
 		
