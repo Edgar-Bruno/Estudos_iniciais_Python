@@ -16,6 +16,7 @@ class Aplicacao:
 		self.window.set_title("Sudoku")
 		self.window.connect('destroy', lambda w: gtk.main_quit())
 		self.window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+		self.window.set_border_width(10)
 		#self.window.set_size_request(550, 550)
 
 		self.cria_widgets()
@@ -24,7 +25,7 @@ class Aplicacao:
 
 	def cria_widgets(self):
 
-		self.hbox = gtk.HBox(True, 50)
+		self.hbox = gtk.HBox(False, 0)
 		self.table = gtk.Table(3,3, gtk.TRUE)
 
 		x = 0
@@ -59,23 +60,31 @@ class Aplicacao:
 			z = 0
 			for iq in range(3):
 
-				#print "Valores de [i = %d, z = %d, iq = %d]" % (i, z, iq)
-				#print quadMontado
 				for d in range(i+z, i+3+z):
 					#print "Indice = %d Valor = %d" % (d, listaMatriz[d])
 					dicValores[d] = [listaMatriz[d]]
 					quadMontado.append(d)
+
 				z += 9
-			
-			#print quadMontado
 
-			for ii in quadMontado:
-				
-				self.button = gtk.Button(str(dicValores[ii][0]))
+			for id in quadMontado:
 
-				self.button.connect("clicked", self.click_btn, dicValores, ii)
+				self.event_box = gtk.EventBox()
 				
-				self.table_b.attach(self.button, xx, xx+1, yy, yy+1)
+				self.label = gtk.Label(str(dicValores[id][0]))
+
+				self.label.set_size_request(35, 35)
+
+				self.event_box.add(self.label)
+				self.event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
+
+				self.event_box.connect("button_press_event", self.click_btn, dicValores, id)
+
+				if id % 2 ==0:
+					self.event_box.modify_bg(gtk.STATE_NORMAL,
+	                            self.event_box.get_colormap().alloc_color("#D3D3D3"))
+
+				self.table_b.attach(self.event_box, xx, xx+1, yy, yy+1)
 
 				xx += 1
 				if xx > 2:
@@ -83,7 +92,7 @@ class Aplicacao:
 					yy += 1
 
 			self.frame.add(self.table_b)
-			self.table.attach(self.frame, x, x+1, y, y+1,xpadding=3, ypadding=3)
+			self.table.attach(self.frame, x, x+1, y, y+1,xpadding=2, ypadding=2)
 
 			x += 1
 			if x > 2:
@@ -92,13 +101,15 @@ class Aplicacao:
 
 		self.hbox.pack_start(self.table, True, False, 50)
 
-
 		self.window.add(self.hbox)
 
-	def click_btn(self, widget, dicValores, id):
-		cnum = widget.get_label()
-		print "Valor = %d, id = %d" % (dicValores[id][0], id)
+	def is_focus():
+		print "FOCUS"
 
+	def click_btn(self, widget, x, dicValores, id):
+		#print "AQUI ", dicValores[id]
+		print "Valor = %d, id = %d" % (dicValores[id][0], id)
+		print self.label.set_text("X")
 
 	def abscissas(self, listaMatriz, numeroSorteado, indexMatriz):
 		# verifica se a ocorrência de números repetidos no eixo X
@@ -134,9 +145,9 @@ class Aplicacao:
 		for i in posFix:
 			z = 0
 			validarQuad =[]
+
 			for x in range(9):
 
-				#print "AQUI", numeroSorteado
 				validarQuad.append(i+z)
 				z += 1
 				y += 1
@@ -145,7 +156,7 @@ class Aplicacao:
 					y = 0
 					z += 6
 
-			#print validarQuad
+			
 			if indexMatriz in validarQuad:
 				inIndex = i
 				break
