@@ -8,8 +8,6 @@ pygtk.require('2.0')
 import gtk
 
 class Aplicacao:
-
-
 	def __init__(self):
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 
@@ -19,7 +17,10 @@ class Aplicacao:
 		self.window.set_border_width(10)
 		#self.window.set_size_request(550, 550)
 
+		self.matrizSudoku = self.criarMatriz()
+		
 		self.cria_widgets()
+
 
 		self.window.show_all()
 
@@ -33,16 +34,10 @@ class Aplicacao:
 
 		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 
-		listaMatriz =[None]
-		s = 0
+		#self.matrizSudoku =
+		#s = 0
 
-		while not len(listaMatriz) == 81:
-			listaMatriz = self.criarMatriz()
-			s += 1
-			print "Tentativa -> " ,s
-
-		print "*****************"
-		#print listaMatriz
+		#print self.matrizSudoku
 
 		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
 		dicValores = {}
@@ -58,29 +53,32 @@ class Aplicacao:
 			quadMontado = []
 
 			z = 0
+
 			for iq in range(3):
 
 				for d in range(i+z, i+3+z):
-					#print "Indice = %d Valor = %d" % (d, listaMatriz[d])
-					dicValores[d] = [listaMatriz[d]]
+					#print "Indice = %d Valor = %d" % (d, self.matrizSudoku[d])
+					dicValores[d] = [self.matrizSudoku[d]]
 					quadMontado.append(d)
 
 				z += 9
 
-			for id in quadMontado:
+			for idNum in quadMontado:
 
 				self.event_box = gtk.EventBox()
 				
-				self.label = gtk.Label(str(dicValores[id][0]))
+				self.label = gtk.Label(str(dicValores[idNum][0]))
 
+				dicValores[idNum].append(self.label)
+				
 				self.label.set_size_request(35, 35)
 
 				self.event_box.add(self.label)
 				self.event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
 
-				self.event_box.connect("button_press_event", self.click_btn, dicValores, id)
+				self.event_box.connect("button_press_event", self.click_btn, dicValores, idNum)
 
-				if id % 2 ==0:
+				if idNum % 2 == 0:
 					self.event_box.modify_bg(gtk.STATE_NORMAL,
 	                            self.event_box.get_colormap().alloc_color("#D3D3D3"))
 
@@ -92,7 +90,7 @@ class Aplicacao:
 					yy += 1
 
 			self.frame.add(self.table_b)
-			self.table.attach(self.frame, x, x+1, y, y+1,xpadding=2, ypadding=2)
+			self.table.attach(self.frame, x, x+1, y, y+1, xpadding=2, ypadding=2)
 
 			x += 1
 			if x > 2:
@@ -103,13 +101,19 @@ class Aplicacao:
 
 		self.window.add(self.hbox)
 
-	def is_focus():
-		print "FOCUS"
-
 	def click_btn(self, widget, x, dicValores, id):
 		#print "AQUI ", dicValores[id]
-		print "Valor = %d, id = %d" % (dicValores[id][0], id)
-		print self.label.set_text("X")
+		#print "Valor = %d, id = %d" % (dicValores[id][0], id)
+
+		z = int(dicValores[id][1].get_text())
+		z += 1
+		dicValores[id][1].set_text(str(z))
+
+		print dicValores[id]
+		print self.matrizSudoku
+
+		#print dicValores[id][1].set_text("X")
+	
 
 	def abscissas(self, listaMatriz, numeroSorteado, indexMatriz):
 		# verifica se a ocorrência de números repetidos no eixo X
@@ -193,12 +197,12 @@ class Aplicacao:
 
 			if True in checkRepeti:
 
-				if quebraLoopInfinito == 25:
+				if quebraLoopInfinito == 20:
 					listaNumeros = []
 					quebraLoopInfinito = 0
 					resetCriaMatriz += 1
 				
-					if resetCriaMatriz == 25:
+					if resetCriaMatriz == 10:
 						vaux = True
 
 				quebraLoopInfinito += 1
@@ -217,6 +221,11 @@ class Aplicacao:
 
 						# Finzalia o while ao atingir a quantidade de números necessários para criar o jogo	
 						vaux = True
+
+		while not len(listaMatriz) == 81:
+			listaMatriz = self.criarMatriz()
+
+		print "*****************"
 
 		return listaMatriz
 		
