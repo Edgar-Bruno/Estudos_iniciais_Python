@@ -8,6 +8,7 @@ pygtk.require('2.0')
 import gtk
 
 class Aplicacao:
+
 	def __init__(self):
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 
@@ -18,9 +19,8 @@ class Aplicacao:
 		#self.window.set_size_request(550, 550)
 
 		self.matrizSudoku = self.criarMatriz()
-		
-		self.cria_widgets()
 
+		self.cria_widgets()
 
 		self.window.show_all()
 
@@ -32,14 +32,13 @@ class Aplicacao:
 		x = 0
 		y = 0
 
+		# Posições iniciais de cada quadrante do jogo
 		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
-
-		#self.matrizSudoku =
-		#s = 0
 
 		#print self.matrizSudoku
 
 		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
+	
 		dicValores = {}
 
 		for i in posFix:
@@ -58,21 +57,21 @@ class Aplicacao:
 
 				for d in range(i+z, i+3+z):
 					#print "Indice = %d Valor = %d" % (d, self.matrizSudoku[d])
-					dicValores[d] = [self.matrizSudoku[d]]
+					# A key do dicionário é o index da matrizSudoku. O Seu valor será o elemento label
+					dicValores[d] = None
 					quadMontado.append(d)
 
 				z += 9
 
 			for idNum in quadMontado:
 
-				self.event_box = gtk.EventBox()
-				
-				self.label = gtk.Label(str(dicValores[idNum][0]))
-
-				dicValores[idNum].append(self.label)
+				self.label = gtk.Label(str(self.matrizSudoku[idNum]))
 				
 				self.label.set_size_request(35, 35)
 
+				dicValores[idNum] = self.label
+				
+				self.event_box = gtk.EventBox()
 				self.event_box.add(self.label)
 				self.event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
 
@@ -101,18 +100,43 @@ class Aplicacao:
 
 		self.window.add(self.hbox)
 
-	def click_btn(self, widget, x, dicValores, id):
-		#print "AQUI ", dicValores[id]
-		#print "Valor = %d, id = %d" % (dicValores[id][0], id)
+	def click_btn(self, widget, event, dicValores, indexMatriz):
+		#print "AQUI ", dicValores[indexMatriz]
+		#print "Valor = %d, indexMatriz = %d" % (dicValores[indexMatriz][0], indexMatriz)
 
-		z = int(dicValores[id][1].get_text())
-		z += 1
-		dicValores[id][1].set_text(str(z))
+		#z = int(dicValores[indexMatriz][1].get_text())
+		#z += 1
+		#dicValores[indexMatriz][1].set_text(str(z))
 
-		print dicValores[id]
-		print self.matrizSudoku
+		checkValor = int(dicValores[indexMatriz].get_text())
 
-		#print dicValores[id][1].set_text("X")
+		if event.button == 1:
+			 checkValor += 1
+			 if checkValor > 9:
+			 	checkValor = 1
+			
+		#elif event.button == 2:
+			#botão do meio
+		elif event.button == 3:
+			checkValor -= 1
+			if checkValor < 1:
+				checkValor = 9
+
+		dicValores[indexMatriz].set_text(str(checkValor))
+
+		print self.abscissas(self.matrizSudoku, checkValor, indexMatriz)
+		"""
+		
+		if event.type == gtk.gdk.BUTTON_PRESS:
+			print "single click"
+		elif event.type == gtk.gdk._2BUTTON_PRESS:
+			print "double click"
+		elif event.type == gtk.gdk._3BUTTON_PRESS:
+			print "triple click. ouch, you hurt your user."
+		"""	
+		#print self.matrizSudoku
+
+		#print dicValores[indexMatriz][1].set_text("X")
 	
 
 	def abscissas(self, listaMatriz, numeroSorteado, indexMatriz):
@@ -160,7 +184,6 @@ class Aplicacao:
 					y = 0
 					z += 6
 
-			
 			if indexMatriz in validarQuad:
 				inIndex = i
 				break
@@ -170,10 +193,11 @@ class Aplicacao:
 			quadMontado.extend(listaMatrizTMP[inIndex+z:inIndex+3+z])
 
 			z += 9
-
+		#print dir(self)
 		return numeroSorteado in quadMontado
 
 	def criarMatriz(self):
+	
 		# Função responsável pela sequência de números para criar o jogo 
 
 		vaux = False

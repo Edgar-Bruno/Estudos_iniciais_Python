@@ -62,3 +62,114 @@ def quadrante
 		print "quadMontado ->", quadMontado
 		
 		#raw_input("Press Enter to continue...")
+
+##########################################################################
+def cria_widgets(self):
+
+		self.hbox = gtk.HBox(False, 0)
+		self.table = gtk.Table(3,3, gtk.TRUE)
+
+		x = 0
+		y = 0
+
+		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
+
+		#print self.matrizSudoku
+
+		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
+	
+		dicValores = {}
+
+		for i in posFix:
+			self.table_b = gtk.Table(3,3, gtk.TRUE)
+			self.frame = gtk.Frame()
+	
+			xx = 0
+			yy = 0
+
+			#monta o quadrante
+			quadMontado = []
+
+			z = 0
+
+			for iq in range(3):
+
+				for d in range(i+z, i+3+z):
+					#print "Indice = %d Valor = %d" % (d, self.matrizSudoku[d])
+					dicValores[d] = [self.matrizSudoku[d]]
+					quadMontado.append(d)
+
+				z += 9
+
+			for idNum in quadMontado:
+
+				self.event_box = gtk.EventBox()
+				
+				self.label = gtk.Label(str(dicValores[idNum][0]))
+
+				dicValores[idNum].append(self.label)
+				
+				self.label.set_size_request(35, 35)
+
+				self.event_box.add(self.label)
+				self.event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
+
+				self.event_box.connect("button_press_event", self.click_btn, dicValores, idNum)
+
+				if idNum % 2 == 0:
+					self.event_box.modify_bg(gtk.STATE_NORMAL,
+	                            self.event_box.get_colormap().alloc_color("#D3D3D3"))
+
+				self.table_b.attach(self.event_box, xx, xx+1, yy, yy+1)
+
+				xx += 1
+				if xx > 2:
+					xx = 0
+					yy += 1
+
+			self.frame.add(self.table_b)
+			self.table.attach(self.frame, x, x+1, y, y+1, xpadding=2, ypadding=2)
+
+			x += 1
+			if x > 2:
+				x = 0
+				y += 1
+
+		self.hbox.pack_start(self.table, True, False, 50)
+
+		self.window.add(self.hbox)
+
+	def click_btn(self, widget, x, dicValores, indexMatriz):
+		#print "AQUI ", dicValores[indexMatriz]
+		#print "Valor = %d, indexMatriz = %d" % (dicValores[indexMatriz][0], indexMatriz)
+
+		z = int(dicValores[indexMatriz][1].get_text())
+		z += 1
+		dicValores[indexMatriz][1].set_text(str(z))
+
+		print dicValores[indexMatriz]
+		print self.matrizSudoku
+
+		#print dicValores[indexMatriz][1].set_text("X")
+
+########################################################################
+Mouse events
+if event.button == 1:
+			 checkValor += 1
+			
+		#elif event.button == 2:
+			#botão do meio
+		elif event.button == 3:
+			checkValor -= 1
+
+		dicValores[indexMatriz].set_text(str(checkValor))
+
+		print self.abscissas(self.matrizSudoku, checkValor, indexMatriz)
+		"""
+		
+		if event.type == gtk.gdk.BUTTON_PRESS:
+			print "single click"
+		elif event.type == gtk.gdk._2BUTTON_PRESS:
+			print "double click"
+		elif event.type == gtk.gdk._3BUTTON_PRESS:
+			print "triple click. ouch, you hurt your user."
