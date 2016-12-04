@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Exemplo de tela para montar o jogo SUDOKU
-import pygtk
+#Exemplo de jogo SUDOKU
+import pygtk, copy
 from random import randint
 pygtk.require('2.0')
 import gtk
@@ -19,6 +19,8 @@ class Aplicacao:
 		#self.window.set_size_request(550, 550)
 
 		self.matrizSudoku = self.criarMatriz()
+
+		self.matrizSudokuOculta = self.ocutador()
 
 		self.cria_widgets()
 
@@ -56,8 +58,8 @@ class Aplicacao:
 			for iq in range(3):
 
 				for d in range(i+z, i+3+z):
-					#print "Indice = %d Valor = %d" % (d, self.matrizSudoku[d])
-					# A key do dicionário é o index da matrizSudoku. O Seu valor será o elemento label
+					#print "Indice = %d Valor = %d" % (d, self.matrizSudokuOculta[d])
+					# A key do dicionário é o index da matrizSudokuOculta. O Seu valor será o elemento label
 					dicValores[d] = None
 					quadMontado.append(d)
 
@@ -65,17 +67,24 @@ class Aplicacao:
 
 			for idNum in quadMontado:
 
-				self.label = gtk.Label(str(self.matrizSudoku[idNum]))
+				self.event_box = gtk.EventBox()
+				
+				if self.matrizSudokuOculta[idNum] == 0:
+					
+					self.label = gtk.Label("")
+					self.event_box.connect("button_press_event", self.click_btn, dicValores, idNum)
+
+				else:
+
+					self.label = gtk.Label(str(self.matrizSudokuOculta[idNum]))
 				
 				self.label.set_size_request(35, 35)
 
 				dicValores[idNum] = self.label
 				
-				self.event_box = gtk.EventBox()
 				self.event_box.add(self.label)
 				self.event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
 
-				self.event_box.connect("button_press_event", self.click_btn, dicValores, idNum)
 
 				if idNum % 2 == 0:
 					self.event_box.modify_bg(gtk.STATE_NORMAL,
@@ -101,14 +110,12 @@ class Aplicacao:
 		self.window.add(self.hbox)
 
 	def click_btn(self, widget, event, dicValores, indexMatriz):
-		#print "AQUI ", dicValores[indexMatriz]
-		#print "Valor = %d, indexMatriz = %d" % (dicValores[indexMatriz][0], indexMatriz)
 
-		#z = int(dicValores[indexMatriz][1].get_text())
-		#z += 1
-		#dicValores[indexMatriz][1].set_text(str(z))
+		if dicValores[indexMatriz].get_text() == "":
+			checkValor = 0
 
-		checkValor = int(dicValores[indexMatriz].get_text())
+		else:
+			checkValor = int(dicValores[indexMatriz].get_text())
 
 		if event.button == 1:
 			 checkValor += 1
@@ -124,23 +131,11 @@ class Aplicacao:
 
 		dicValores[indexMatriz].set_text(str(checkValor))
 
-		print self.abscissas(self.matrizSudoku, checkValor, indexMatriz)
-		"""
-		
-		if event.type == gtk.gdk.BUTTON_PRESS:
-			print "single click"
-		elif event.type == gtk.gdk._2BUTTON_PRESS:
-			print "double click"
-		elif event.type == gtk.gdk._3BUTTON_PRESS:
-			print "triple click. ouch, you hurt your user."
-		"""	
-		#print self.matrizSudoku
-
-		#print dicValores[indexMatriz][1].set_text("X")
+		print self.abscissas(self.matrizSudokuOculta, checkValor, indexMatriz)
 	
 
 	def abscissas(self, listaMatriz, numeroSorteado, indexMatriz):
-		# verifica se a ocorrência de números repetidos no eixo X
+		# verifica se há ocorrência de números repetidos no eixo X
 		#lado esquedo
 
 		i = indexMatriz
@@ -151,7 +146,7 @@ class Aplicacao:
 		return numeroSorteado in listaMatriz[i:i+9]
 	
 	def ordenadas(self, listaMatriz, numeroSorteado, indexMatriz):
-		# verifica se a ocorrência de números repetidos no eixo Y
+		# verifica se há ocorrência de números repetidos no eixo Y
 		#Sobe
 
 		i = indexMatriz
@@ -161,6 +156,7 @@ class Aplicacao:
 		return numeroSorteado in listaMatriz[i::9]
 
 	def quadrante(self, listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
+		# Verifica se há ocorrência de números repetidos no quadrante
 
 		listaMatrizTMP = listaMatriz + listaNumeros
 
@@ -193,7 +189,7 @@ class Aplicacao:
 			quadMontado.extend(listaMatrizTMP[inIndex+z:inIndex+3+z])
 
 			z += 9
-		#print dir(self)
+
 		return numeroSorteado in quadMontado
 
 	def criarMatriz(self):
@@ -206,7 +202,7 @@ class Aplicacao:
 		listaNumeros = [] # Cria uma lista com 11 números após, ser inserida em listaMatriz seu valor é resetado
 		listaMatriz = [] # Recebe todos números da listaNumeros
 		quebraLoopInfinito = 0 # Mecanismo para impedir loops infinitos
-		resetCriaMatriz = 0 # Mecanismo para "resetar" a um, eventual, loop infinito
+		resetCriaMatriz = 0 # Mecanismo para "resetar" a matriz quando, é, identificado um eventual loop infinito 
 
 		while not vaux:
 			
@@ -216,8 +212,6 @@ class Aplicacao:
 			checkRepeti.append(self.abscissas(listaNumeros, numeroSorteado, len(listaNumeros)))
 			checkRepeti.append(self.ordenadas(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros)))	
 			checkRepeti.append(self.quadrante(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros), listaNumeros))
-
-			#print checkRepeti
 
 			if True in checkRepeti:
 
@@ -247,11 +241,30 @@ class Aplicacao:
 						vaux = True
 
 		while not len(listaMatriz) == 81:
+		# Faz a segunda conferência da listaMatriz
 			listaMatriz = self.criarMatriz()
 
-		print "*****************"
-
 		return listaMatriz
+
+	def ocutador(self):
+		
+		#Função responsável por ocultar os números da matrizSudoku
+
+		listaMatrizOculta = copy.copy(self.matrizSudoku)
+
+		listaOcultados = []
+
+		while not len(listaOcultados) == 50:
+		# Quantidade limite de números ocultados
+
+			ocultar = randint(0,80)
+
+			if not ocultar in listaOcultados:
+				listaOcultados.append(ocultar)
+
+				listaMatrizOculta[ocultar] = 0
+		
+		return listaMatrizOculta
 		
 	def main(self):
 

@@ -154,6 +154,14 @@ def cria_widgets(self):
 
 ########################################################################
 Mouse events
+
+	#print "AQUI ", dicValores[indexMatriz]
+		#print "Valor = %d, indexMatriz = %d" % (dicValores[indexMatriz][0], indexMatriz)
+
+		#z = int(dicValores[indexMatriz][1].get_text())
+		#z += 1
+		#dicValores[indexMatriz][1].set_text(str(z))
+
 if event.button == 1:
 			 checkValor += 1
 			
