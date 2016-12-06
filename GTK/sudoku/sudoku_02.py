@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 #Exemplo de jogo SUDOKU
-import pygtk, copy
+import pygtk, gtk, copy, pango
 from random import randint
 pygtk.require('2.0')
-import gtk
 
 class Aplicacao:
 
@@ -22,7 +21,9 @@ class Aplicacao:
 
 		self.matrizSudokuOculta = self.ocutador()
 
-		self.cria_widgets()
+		#self.dicValores = self.dicionarioValores()
+
+		self.dicValores = self.cria_widgets()
 
 		self.window.show_all()
 
@@ -60,8 +61,8 @@ class Aplicacao:
 				for d in range(i+z, i+3+z):
 					#print "Indice = %d Valor = %d" % (d, self.matrizSudokuOculta[d])
 					# A key do dicionário é o index da matrizSudokuOculta. O Seu valor será o elemento label
-					dicValores[d] = None
 					quadMontado.append(d)
+					dicValores[d] = None
 
 				z += 9
 
@@ -72,16 +73,23 @@ class Aplicacao:
 				if self.matrizSudokuOculta[idNum] == 0:
 					
 					self.label = gtk.Label("")
-					self.event_box.connect("button_press_event", self.click_btn, dicValores, idNum)
+					self.event_box.connect("button_press_event", self.click_btn, {idNum : self.label}, idNum)
 
 				else:
 
 					self.label = gtk.Label(str(self.matrizSudokuOculta[idNum]))
 				
 				self.label.set_size_request(35, 35)
+				self.label.set_use_markup(True)
 
-				dicValores[idNum] = self.label
+				attr = pango.AttrList()
+				size = pango.AttrSize(20000, 0, 1)
+				attr.insert(size)
+
+				self.label.set_attributes(attr)
 				
+				dicValores[idNum] = self.label
+
 				self.event_box.add(self.label)
 				self.event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
 
@@ -109,13 +117,16 @@ class Aplicacao:
 
 		self.window.add(self.hbox)
 
-	def click_btn(self, widget, event, dicValores, indexMatriz):
+		#print dicValores
+		return dicValores
 
-		if dicValores[indexMatriz].get_text() == "":
+	def click_btn(self, widget, event, dicLocal, indexMatriz):
+
+		if dicLocal[indexMatriz].get_text() == "":
 			checkValor = 0
 
 		else:
-			checkValor = int(dicValores[indexMatriz].get_text())
+			checkValor = int(dicLocal[indexMatriz].get_text())
 
 		if event.button == 1:
 			 checkValor += 1
@@ -129,21 +140,58 @@ class Aplicacao:
 			if checkValor < 1:
 				checkValor = 9
 
-		dicValores[indexMatriz].set_text(str(checkValor))
+		dicLocal[indexMatriz].set_text(str(checkValor))
+		# Valor exibido no label
 
-		print self.abscissas(self.matrizSudokuOculta, checkValor, indexMatriz)
-	
+		self.matrizSudokuOculta[indexMatriz] = checkValor
+		# inclui o novo valor na matriz e esse será verificado posteriormente
 
-	def abscissas(self, listaMatriz, numeroSorteado, indexMatriz):
+		dicAbscissas = self.abscissas(self.matrizSudokuOculta, indexMatriz, None, flag=True)
+		# Verifica eixo X ao jogar
+		for i in dicAbscissas.keys():
+			if dicAbscissas[i]:
+			# Destaca a cor do número repedido
+				self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#DF0E0A'))
+
+			else:
+				self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#4F4E4E'))
+
+	def abscissas(self, listaMatriz, indexMatriz, numeroSorteado=None, flag=None):
 		# verifica se há ocorrência de números repetidos no eixo X
 		#lado esquedo
 
 		i = indexMatriz
-		
+
 		while i % 9 != 0:
 			i -= 1
 
-		return numeroSorteado in listaMatriz[i:i+9]
+		if flag:
+		# Verificação de há repetição de um número em mais de uma vez
+			dicAbscissas = {} # Key é o index da listaMatriz, value será True ou False
+
+			listaAbscissasTMP = listaMatriz[i:i+9] # lista da linha pesquisada. Index inicial = 0
+
+			for ii, indexO in enumerate(range(i, i+9)):
+			# Verifica se há outras repetições na linha
+				vaux = listaAbscissasTMP[ii]	# valor do elemento a conferido mais de uma repetição
+				listaAbscissasTMP[ii] = None	# Substituição do valor pesquisado
+							
+				if vaux in listaAbscissasTMP:
+					dicAbscissas[indexO] = True
+
+				else:
+
+					dicAbscissas[indexO] = False
+
+				listaAbscissasTMP[ii] = vaux # Retorna o valor original
+
+			checkRepeti = dicAbscissas
+
+		else:
+		# Função criarMatriz
+			checkRepeti = numeroSorteado in listaMatriz[i:i+9]
+
+		return checkRepeti
 	
 	def ordenadas(self, listaMatriz, numeroSorteado, indexMatriz):
 		# verifica se há ocorrência de números repetidos no eixo Y
@@ -209,7 +257,7 @@ class Aplicacao:
 			numeroSorteado = randint(1,9)
 	
 			checkRepeti =[] # Recebe booleano de repetição ods números no eixo Y e no quadrante
-			checkRepeti.append(self.abscissas(listaNumeros, numeroSorteado, len(listaNumeros)))
+			checkRepeti.append(self.abscissas(listaNumeros, len(listaNumeros), numeroSorteado))
 			checkRepeti.append(self.ordenadas(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros)))	
 			checkRepeti.append(self.quadrante(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros), listaNumeros))
 
