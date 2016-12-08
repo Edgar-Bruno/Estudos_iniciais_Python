@@ -45,6 +45,7 @@ class Aplicacao:
 		dicValores = {}
 
 		for i in posFix:
+
 			self.table_b = gtk.Table(3,3, gtk.TRUE)
 			self.frame = gtk.Frame()
 	
@@ -70,20 +71,35 @@ class Aplicacao:
 
 				self.event_box = gtk.EventBox()
 				
+				if idNum % 2 == 0:
+					self.event_box.modify_bg(gtk.STATE_NORMAL,
+	                            self.event_box.get_colormap().alloc_color("#cccccc"))
+
+				attr = pango.AttrList()
+				
 				if self.matrizSudokuOculta[idNum] == 0:
 					
 					self.label = gtk.Label("")
-					self.event_box.connect("button_press_event", self.click_btn, {idNum : self.label}, idNum)
+					self.event_box.connect("button_press_event", self.click_btn, self.label, idNum)
+					size = pango.AttrSize(18000, 0, 1)
 
 				else:
+					
+					if idNum % 2 == 0:
+						self.event_box.modify_bg(gtk.STATE_NORMAL,
+							self.event_box.get_colormap().alloc_color("#c5c5ef"))
+					else:
+						self.event_box.modify_bg(gtk.STATE_NORMAL,
+							self.event_box.get_colormap().alloc_color("#d7d7f4"))
 
-					self.label = gtk.Label(str(self.matrizSudokuOculta[idNum]))
+					self.label = gtk.Label()
+					self.label.set_markup("<b>%s</b>" % str(self.matrizSudokuOculta[idNum]))
+					size = pango.AttrSize(20000, 0, 1)
 				
+				self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#292929'))
 				self.label.set_size_request(35, 35)
-				self.label.set_use_markup(True)
+				
 
-				attr = pango.AttrList()
-				size = pango.AttrSize(20000, 0, 1)
 				attr.insert(size)
 
 				self.label.set_attributes(attr)
@@ -94,9 +110,6 @@ class Aplicacao:
 				self.event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
 
 
-				if idNum % 2 == 0:
-					self.event_box.modify_bg(gtk.STATE_NORMAL,
-	                            self.event_box.get_colormap().alloc_color("#D3D3D3"))
 
 				self.table_b.attach(self.event_box, xx, xx+1, yy, yy+1)
 
@@ -120,13 +133,13 @@ class Aplicacao:
 		#print dicValores
 		return dicValores
 
-	def click_btn(self, widget, event, dicLocal, indexMatriz):
+	def click_btn(self, widget, event, itemClicado, indexMatriz):
 
-		if dicLocal[indexMatriz].get_text() == "":
+		if itemClicado.get_text() == "":
 			checkValor = 0
 
 		else:
-			checkValor = int(dicLocal[indexMatriz].get_text())
+			checkValor = int(itemClicado.get_text())
 
 		if event.button == 1:
 			 checkValor += 1
@@ -140,21 +153,43 @@ class Aplicacao:
 			if checkValor < 1:
 				checkValor = 9
 
-		dicLocal[indexMatriz].set_text(str(checkValor))
+		itemClicado.set_text(str(checkValor))
 		# Valor exibido no label
 
 		self.matrizSudokuOculta[indexMatriz] = checkValor
 		# inclui o novo valor na matriz e esse será verificado posteriormente
 
-		dicAbscissas = self.abscissas(self.matrizSudokuOculta, indexMatriz, None, flag=True)
+		dicValidador = {}
+
+		metodos = ('abscissas', 'ordenadas', 'quadrante')
+
+		listaValid = []
+
+		for i in metodos:
+		 # Verifica se o elemento clicado está repedito nos três metodos de validação
+		 	dicAux = eval('self.%s(self.matrizSudokuOculta, indexMatriz, flag=True)' % i)
+
+		 	listaValid.append(dicAux[indexMatriz])
+		 	# Essa variável recebe a os booleanos de cada metodo referente ao indexMatriz
+
+		 	dicValidador.update(dicAux)
+
+		if True in listaValid:
+			dicValidador[indexMatriz] = True
+
+		self.validador(dicValidador)
+
+	def validador(self, dicValid):
 		# Verifica eixo X ao jogar
-		for i in dicAbscissas.keys():
-			if dicAbscissas[i]:
+		for i in dicValid.keys():
+			if dicValid[i]:
 			# Destaca a cor do número repedido
 				self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#DF0E0A'))
 
 			else:
-				self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#4F4E4E'))
+				self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#292929'))
+
+
 
 	def abscissas(self, listaMatriz, indexMatriz, numeroSorteado=None, flag=None):
 		# verifica se há ocorrência de números repetidos no eixo X
@@ -193,21 +228,59 @@ class Aplicacao:
 
 		return checkRepeti
 	
-	def ordenadas(self, listaMatriz, numeroSorteado, indexMatriz):
+	def ordenadas(self, listaMatriz, indexMatriz, numeroSorteado=None, flag=None):
 		# verifica se há ocorrência de números repetidos no eixo Y
 		#Sobe
 
 		i = indexMatriz
 		while i >= 9:
 			i -= 9
+		
+		if flag:
+			dicOrdenadas = {} # Key é o index da listaMatriz, value é o existe ou não
+			listaOrdenadasTMP = listaMatriz[i::9] # lista da linha pesquisada. Index inicial = 0
+			
+			for ii in range(9):
 
-		return numeroSorteado in listaMatriz[i::9]
+				vaux = listaOrdenadasTMP[ii]
+				listaOrdenadasTMP[ii] = None
 
-	def quadrante(self, listaMatriz, numeroSorteado, indexMatriz, listaNumeros=None):
+				if vaux in listaOrdenadasTMP:
+					dicOrdenadas[i] = True
+
+				else:
+
+					dicOrdenadas[i] = False
+
+				i += 9
+
+				listaOrdenadasTMP[ii] = vaux # Retorna o valor original
+
+			checkRepeti = dicOrdenadas
+
+		else:
+
+			checkRepeti = numeroSorteado in listaMatriz[i::9]
+
+		return checkRepeti
+
+	def quadrante(self, listaMatriz, indexMatriz, numeroSorteado=None, listaNumeros=None, flag=None):
 		# Verifica se há ocorrência de números repetidos no quadrante
 
-		listaMatrizTMP = listaMatriz + listaNumeros
+		if listaNumeros:
 
+			listaMatrizTMP = listaMatriz + listaNumeros
+		
+		else:
+
+			listaMatrizTMP = listaMatriz
+
+		print numeroSorteado
+		print listaNumeros
+		print flag
+		
+
+		#raw_input("Press Enter to continue...")
 		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 		inIndex = None
 		quadMontado = []
@@ -234,11 +307,32 @@ class Aplicacao:
 		z = 0
 
 		for i in range(3):
+			
 			quadMontado.extend(listaMatrizTMP[inIndex+z:inIndex+3+z])
-
 			z += 9
 
-		return numeroSorteado in quadMontado
+		if flag:
+
+			dicQuadrante = {}
+
+			for i, indexO in enumerate(validarQuad):
+				vaux = quadMontado[i]
+				quadMontado[i] = None
+
+				if vaux in quadMontado:
+
+					dicQuadrante[indexO] = True
+				else:
+					dicQuadrante[indexO] = False
+				
+				quadMontado[i] = vaux
+		
+			checkRepeti = dicQuadrante
+		else:
+
+			checkRepeti = numeroSorteado in quadMontado
+
+		return checkRepeti
 
 	def criarMatriz(self):
 	
@@ -258,8 +352,8 @@ class Aplicacao:
 	
 			checkRepeti =[] # Recebe booleano de repetição ods números no eixo Y e no quadrante
 			checkRepeti.append(self.abscissas(listaNumeros, len(listaNumeros), numeroSorteado))
-			checkRepeti.append(self.ordenadas(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros)))	
-			checkRepeti.append(self.quadrante(listaMatriz, numeroSorteado, len(listaMatriz) + len(listaNumeros), listaNumeros))
+			checkRepeti.append(self.ordenadas(listaMatriz, len(listaMatriz) + len(listaNumeros), numeroSorteado))	
+			checkRepeti.append(self.quadrante(listaMatriz, len(listaMatriz) + len(listaNumeros), numeroSorteado, listaNumeros))
 
 			if True in checkRepeti:
 

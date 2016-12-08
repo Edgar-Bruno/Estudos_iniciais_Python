@@ -25,10 +25,7 @@ listaMatriz = [6, 2, 4, 1, 5, 9, 7, 6, 8,
 while i % 9 != 0: # Encontra o primeiro número index da linha
 		i -= 1
 
-listaMatriz[indexMatriz] = 1
-
 listaAbscissasTMP = listaMatriz[i:i+9] # lista da linha pesquisada. Index inicial = 0
-
 
 print listaAbscissasTMP
 print "------------------------"
