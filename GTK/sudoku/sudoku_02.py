@@ -21,8 +21,6 @@ class Aplicacao:
 
 		self.matrizSudokuOculta = self.ocutador()
 
-		#self.dicValores = self.dicionarioValores()
-
 		self.dicValores = self.cria_widgets()
 
 		self.window.show_all()
@@ -39,7 +37,6 @@ class Aplicacao:
 		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 
 		#print self.matrizSudoku
-
 		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
 	
 		dicValores = {}
@@ -70,6 +67,7 @@ class Aplicacao:
 			for idNum in quadMontado:
 
 				self.event_box = gtk.EventBox()
+				#self.event_box.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.HAND1))
 				
 				if idNum % 2 == 0:
 					self.event_box.modify_bg(gtk.STATE_NORMAL,
@@ -99,7 +97,6 @@ class Aplicacao:
 				self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#292929'))
 				self.label.set_size_request(35, 35)
 				
-
 				attr.insert(size)
 
 				self.label.set_attributes(attr)
@@ -170,7 +167,7 @@ class Aplicacao:
 		 	dicAux = eval('self.%s(self.matrizSudokuOculta, indexMatriz, flag=True)' % i)
 
 		 	listaValid.append(dicAux[indexMatriz])
-		 	# Essa variável recebe a os booleanos de cada metodo referente ao indexMatriz
+		 	# Essa variável recebe os booleanos de cada metodo referente ao indexMatriz
 
 		 	dicValidador.update(dicAux)
 
@@ -180,7 +177,7 @@ class Aplicacao:
 		self.validador(dicValidador)
 
 	def validador(self, dicValid):
-		# Verifica eixo X ao jogar
+		# Valida a repetição dos números
 		for i in dicValid.keys():
 			if dicValid[i]:
 			# Destaca a cor do número repedido
@@ -189,11 +186,29 @@ class Aplicacao:
 			else:
 				self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#292929'))
 
+	def verificador(self, keys, values):
+		#Verifica a ocorrencia de números repetidos no momento do jogo
 
+		dictTMP = dict(zip(keys, values)) # Keys é o index e values é o valor da listaMatriz 
+
+		dicVerificador = {} # Key é o index da listaMatriz, value será True ou False
+
+		for i in dictTMP:
+			vTMP = dictTMP[i]	# valor do elemento.
+			dictTMP[i] = None 	# Substituição do valor pesquisado
+
+			if vTMP in dictTMP.values():
+				dicVerificador[i] = True
+			else:
+				dicVerificador[i] = False
+
+			dictTMP[i] = vTMP
+
+		return dicVerificador
 
 	def abscissas(self, listaMatriz, indexMatriz, numeroSorteado=None, flag=None):
 		# verifica se há ocorrência de números repetidos no eixo X
-		#lado esquedo
+		#lado esquerdo
 
 		i = indexMatriz
 
@@ -201,29 +216,11 @@ class Aplicacao:
 			i -= 1
 
 		if flag:
-		# Verificação de há repetição de um número em mais de uma vez
-			dicAbscissas = {} # Key é o index da listaMatriz, value será True ou False
-
-			listaAbscissasTMP = listaMatriz[i:i+9] # lista da linha pesquisada. Index inicial = 0
-
-			for ii, indexO in enumerate(range(i, i+9)):
-			# Verifica se há outras repetições na linha
-				vaux = listaAbscissasTMP[ii]	# valor do elemento a conferido mais de uma repetição
-				listaAbscissasTMP[ii] = None	# Substituição do valor pesquisado
-							
-				if vaux in listaAbscissasTMP:
-					dicAbscissas[indexO] = True
-
-				else:
-
-					dicAbscissas[indexO] = False
-
-				listaAbscissasTMP[ii] = vaux # Retorna o valor original
-
-			checkRepeti = dicAbscissas
+		
+			checkRepeti = self.verificador(range(i, i+9), listaMatriz[i:i+9])
 
 		else:
-		# Função criarMatriz
+
 			checkRepeti = numeroSorteado in listaMatriz[i:i+9]
 
 		return checkRepeti
@@ -237,26 +234,8 @@ class Aplicacao:
 			i -= 9
 		
 		if flag:
-			dicOrdenadas = {} # Key é o index da listaMatriz, value é o existe ou não
-			listaOrdenadasTMP = listaMatriz[i::9] # lista da linha pesquisada. Index inicial = 0
-			
-			for ii in range(9):
-
-				vaux = listaOrdenadasTMP[ii]
-				listaOrdenadasTMP[ii] = None
-
-				if vaux in listaOrdenadasTMP:
-					dicOrdenadas[i] = True
-
-				else:
-
-					dicOrdenadas[i] = False
-
-				i += 9
-
-				listaOrdenadasTMP[ii] = vaux # Retorna o valor original
-
-			checkRepeti = dicOrdenadas
+			# List Comprehensions list = [i+x*9 for x in range(9)]
+			checkRepeti = self.verificador([i+x*9 for x in range(9)], listaMatriz[i::9])
 
 		else:
 
@@ -275,25 +254,19 @@ class Aplicacao:
 
 			listaMatrizTMP = listaMatriz
 
-		print numeroSorteado
-		print listaNumeros
-		print flag
-		
-
-		#raw_input("Press Enter to continue...")
 		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 		inIndex = None
-		quadMontado = []
+		quadranteValores = []
 
 		y = 0
 
 		for i in posFix:
 			z = 0
-			validarQuad =[]
+			quadranteIndex =[]
 
 			for x in range(9):
 
-				validarQuad.append(i+z)
+				quadranteIndex.append(i+z)
 				z += 1
 				y += 1
 
@@ -301,36 +274,23 @@ class Aplicacao:
 					y = 0
 					z += 6
 
-			if indexMatriz in validarQuad:
+			if indexMatriz in quadranteIndex:
 				inIndex = i
 				break
 		z = 0
 
 		for i in range(3):
 			
-			quadMontado.extend(listaMatrizTMP[inIndex+z:inIndex+3+z])
+			quadranteValores.extend(listaMatrizTMP[inIndex+z:inIndex+3+z])
 			z += 9
 
 		if flag:
 
-			dicQuadrante = {}
-
-			for i, indexO in enumerate(validarQuad):
-				vaux = quadMontado[i]
-				quadMontado[i] = None
-
-				if vaux in quadMontado:
-
-					dicQuadrante[indexO] = True
-				else:
-					dicQuadrante[indexO] = False
-				
-				quadMontado[i] = vaux
-		
-			checkRepeti = dicQuadrante
+			checkRepeti = self.verificador(quadranteIndex, quadranteValores)
+			
 		else:
 
-			checkRepeti = numeroSorteado in quadMontado
+			checkRepeti = numeroSorteado in quadranteValores
 
 		return checkRepeti
 

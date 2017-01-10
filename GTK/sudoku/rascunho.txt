@@ -181,3 +181,34 @@ if event.button == 1:
 			print "double click"
 		elif event.type == gtk.gdk._3BUTTON_PRESS:
 			print "triple click. ouch, you hurt your user."
+
+
+
+########################################################################
+def abscissas
+# Verificação de há repetição de um número em mais de uma vez
+			"""dicAbscissas = {} # Key é o index da listaMatriz, value será True ou False
+									
+												#dicx = {n: True for n in range(i, i+9)}
+									
+												#dicx = dict(zip(keys, values))
+									
+												#dicx = dict(zip(range(i, i+9), listaMatriz[i:i+9]))
+									
+												listaAbscissasTMP = listaMatriz[i:i+9] # lista da linha pesquisada. Index inicial = 0
+									
+												for ii, indexO in enumerate(range(i, i+9)):
+												#	print "Index0 ", i+9
+												# Verifica se há outras repetições na linha
+													vaux = listaAbscissasTMP[ii]	# valor do elemento. conferindo mais de uma repetição
+													listaAbscissasTMP[ii] = None	# Substituição do valor pesquisado
+																
+													if vaux in listaAbscissasTMP:
+									
+														dicAbscissas[indexO] = True
+									
+													else:
+									
+														dicAbscissas[indexO] = False
+									
+													listaAbscissasTMP[ii] = vaux # Retorna o valor original"""
