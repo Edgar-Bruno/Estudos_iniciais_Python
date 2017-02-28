@@ -212,3 +212,34 @@ def abscissas
 														dicAbscissas[indexO] = False
 									
 													listaAbscissasTMP[ii] = vaux # Retorna o valor original"""
+
+
+
+
+########################################################################
+Dictionary Comprehension
+
+>>> keys = ['a', 'b', 'c']
+>>> values = [1, 2, 3]
+
+>>> D = { k:v for (k,v) in zip(keys, values)}
+>>> D
+{'a': 1, 'b': 2, 'c': 3}
+
+
+>>> D = dict(zip(keys, values))
+>>> D
+{'a': 1, 'b': 2, 'c': 3}
+
+-----------------------------------------------------------
+
+
+d = {}
+
+x = [eval('self.%s(self.matrizSudokuOculta, indexMatriz, flag=True)' % i) for i in metodos]
+
+print x[0]
+print x[1]
+print x[2]
+
+d = {k :v for (k, v) in d.items()}

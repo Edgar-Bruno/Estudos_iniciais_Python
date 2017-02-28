@@ -36,12 +36,12 @@ class Aplicacao:
 		# Posições iniciais de cada quadrante do jogo
 		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 
-		#print self.matrizSudoku
+		# print self.matrizSudoku
 		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
 	
 		dicValores = {}
 
-		for i in posFix:
+		for quadNumero, i in enumerate(posFix):
 
 			self.table_b = gtk.Table(3,3, gtk.TRUE)
 			self.frame = gtk.Frame()
@@ -63,15 +63,32 @@ class Aplicacao:
 					dicValores[d] = None
 
 				z += 9
-
+				
 			for idNum in quadMontado:
 
 				self.event_box = gtk.EventBox()
-				#self.event_box.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.HAND1))
+				# self.event_box.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.HAND1))
+				# Aqui será feito a separação dos quadrantes pela cor
+
+				if quadNumero % 2 == 0:
 				
-				if idNum % 2 == 0:
-					self.event_box.modify_bg(gtk.STATE_NORMAL,
-	                            self.event_box.get_colormap().alloc_color("#cccccc"))
+					if idNum % 2 == 0:
+						# Cor 1 do fundo clicavel
+						self.event_box.modify_bg(gtk.STATE_NORMAL,
+		                            self.event_box.get_colormap().alloc_color("#afc6e9"))
+					else:
+						self.event_box.modify_bg(gtk.STATE_NORMAL,
+		                            self.event_box.get_colormap().alloc_color("#d7e3f4"))
+				else:
+
+					if idNum % 2 == 0:
+						# Cor 2 do fundo clicavel
+						self.event_box.modify_bg(gtk.STATE_NORMAL,
+		                            self.event_box.get_colormap().alloc_color("#acbcd5"))
+
+					else:
+						self.event_box.modify_bg(gtk.STATE_NORMAL,
+		                            self.event_box.get_colormap().alloc_color("#c8d0dc"))
 
 				attr = pango.AttrList()
 				
@@ -83,18 +100,19 @@ class Aplicacao:
 
 				else:
 					
-					if idNum % 2 == 0:
-						self.event_box.modify_bg(gtk.STATE_NORMAL,
-							self.event_box.get_colormap().alloc_color("#c5c5ef"))
-					else:
-						self.event_box.modify_bg(gtk.STATE_NORMAL,
-							self.event_box.get_colormap().alloc_color("#d7d7f4"))
+					"""if idNum % 2 == 0:
+																					self.event_box.modify_bg(gtk.STATE_NORMAL,
+																						self.event_box.get_colormap().alloc_color("#b3b3b3"))
+																				else:
+																					self.event_box.modify_bg(gtk.STATE_NORMAL,
+																						self.event_box.get_colormap().alloc_color("#cccccc"))"""
 
 					self.label = gtk.Label()
 					self.label.set_markup("<b>%s</b>" % str(self.matrizSudokuOculta[idNum]))
 					size = pango.AttrSize(20000, 0, 1)
 				
-				self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#292929'))
+				self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#3B3B3B'))
+				# Cor da fonte não clicavel
 				self.label.set_size_request(35, 35)
 				
 				attr.insert(size)
@@ -105,8 +123,6 @@ class Aplicacao:
 
 				self.event_box.add(self.label)
 				self.event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-
-
 
 				self.table_b.attach(self.event_box, xx, xx+1, yy, yy+1)
 
@@ -174,24 +190,23 @@ class Aplicacao:
 		if True in listaValid:
 			dicValidador[indexMatriz] = True
 
-		self.validador(dicValidador)
 
-	def validador(self, dicValid):
 		# Valida a repetição dos números
-		for i in dicValid.keys():
-			if dicValid[i]:
+		for i in dicValidador.keys():
+			if dicValidador[i]:
 			# Destaca a cor do número repedido
 				self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#DF0E0A'))
 
 			else:
+			# Cor padrão dos números sem repetições
 				self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#292929'))
 
 	def verificador(self, keys, values):
 		#Verifica a ocorrencia de números repetidos no momento do jogo
 
-		dictTMP = dict(zip(keys, values)) # Keys é o index e values é o valor da listaMatriz 
-
 		dicVerificador = {} # Key é o index da listaMatriz, value será True ou False
+
+		dictTMP = dict(zip(keys, values)) # Keys é o index e values é o valor da listaMatriz 
 
 		for i in dictTMP:
 			vTMP = dictTMP[i]	# valor do elemento.
@@ -207,7 +222,7 @@ class Aplicacao:
 		return dicVerificador
 
 	def abscissas(self, listaMatriz, indexMatriz, numeroSorteado=None, flag=None):
-		# verifica se há ocorrência de números repetidos no eixo X
+		# verifica se há ocorrência de números repetidos no eixo X para montar a matriz do jogo
 		#lado esquerdo
 
 		i = indexMatriz
@@ -339,7 +354,7 @@ class Aplicacao:
 
 					if len(listaMatriz) is 81:
 
-						# Finzalia o while ao atingir a quantidade de números necessários para criar o jogo	
+						# Finzalia o while ao atingir a quantidade de números necessários para criar o jogo
 						vaux = True
 
 		while not len(listaMatriz) == 81:
