@@ -32,7 +32,7 @@ class EventBoxExample:
 
         # More things you need an X window for ...
         event_box.realize()
-        event_box.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.HAND1))
+        event_box.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOAT))
 
         # Set background color to green
         event_box.modify_bg(gtk.STATE_NORMAL,

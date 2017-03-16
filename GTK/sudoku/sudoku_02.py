@@ -17,6 +17,8 @@ class Aplicacao:
 		self.window.set_border_width(10)
 		#self.window.set_size_request(550, 550)
 
+		self.posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
+
 		self.matrizSudoku = self.criarMatriz()
 
 		self.matrizSudokuOculta = self.ocutador()
@@ -34,14 +36,13 @@ class Aplicacao:
 		y = 0
 
 		# Posições iniciais de cada quadrante do jogo
-		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
+		
 
-		# print self.matrizSudoku
 		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
 	
 		dicValores = {}
 
-		for quadNumero, i in enumerate(posFix):
+		for quadNumero, i in enumerate(self.posFix):
 
 			self.table_b = gtk.Table(3,3, gtk.TRUE)
 			self.frame = gtk.Frame()
@@ -67,6 +68,9 @@ class Aplicacao:
 			for idNum in quadMontado:
 
 				self.event_box = gtk.EventBox()
+
+				self.label = gtk.Label()
+
 				# self.event_box.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.HAND1))
 				# Aqui será feito a separação dos quadrantes pela cor
 
@@ -74,31 +78,31 @@ class Aplicacao:
 				
 					if idNum % 2 == 0:
 						# Cor 1 do fundo clicavel
-						self.event_box.modify_bg(gtk.STATE_NORMAL,
-		                            self.event_box.get_colormap().alloc_color("#afc6e9"))
+						color = "#afc6e9"
 					else:
-						self.event_box.modify_bg(gtk.STATE_NORMAL,
-		                            self.event_box.get_colormap().alloc_color("#d7e3f4"))
+						color = "#d7e3f4"
 				else:
 
 					if idNum % 2 == 0:
-						# Cor 2 do fundo clicavel
-						self.event_box.modify_bg(gtk.STATE_NORMAL,
-		                            self.event_box.get_colormap().alloc_color("#acbcd5"))
 
+						color = "#acbcd5"
+						# Cor 2 do fundo clicavel
 					else:
-						self.event_box.modify_bg(gtk.STATE_NORMAL,
-		                            self.event_box.get_colormap().alloc_color("#c8d0dc"))
+						color = "#c8d0dc"
+
+				self.event_box.modify_bg(gtk.STATE_NORMAL,
+					self.event_box.get_colormap().alloc_color(color))
 
 				attr = pango.AttrList()
 				
 				if self.matrizSudokuOculta[idNum] == 0:
 					
-					self.label = gtk.Label("")
+					self.label.set_text("")
 					self.event_box.connect("button_press_event", self.click_btn, self.label, idNum)
-					size = pango.AttrSize(18000, 0, 1)
+					size = pango.AttrSize(15000, 0, 1)
 
 				else:
+					# Cor da fonte não clicavel
 					
 					"""if idNum % 2 == 0:
 																					self.event_box.modify_bg(gtk.STATE_NORMAL,
@@ -107,13 +111,11 @@ class Aplicacao:
 																					self.event_box.modify_bg(gtk.STATE_NORMAL,
 																						self.event_box.get_colormap().alloc_color("#cccccc"))"""
 
-					self.label = gtk.Label()
 					self.label.set_markup("<b>%s</b>" % str(self.matrizSudokuOculta[idNum]))
 					size = pango.AttrSize(20000, 0, 1)
 				
-				self.label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#3B3B3B'))
-				# Cor da fonte não clicavel
-				self.label.set_size_request(35, 35)
+
+				self.label.set_size_request(40, 40)
 				
 				attr.insert(size)
 
@@ -122,9 +124,10 @@ class Aplicacao:
 				dicValores[idNum] = self.label
 
 				self.event_box.add(self.label)
+
 				self.event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
 
-				self.table_b.attach(self.event_box, xx, xx+1, yy, yy+1)
+				self.table_b.attach(self.event_box, xx, xx+1, yy, yy+1, xpadding=1, ypadding=1)
 
 				xx += 1
 				if xx > 2:
@@ -142,6 +145,10 @@ class Aplicacao:
 		self.hbox.pack_start(self.table, True, False, 50)
 
 		self.window.add(self.hbox)
+
+		self.event_box.realize()
+
+		self.event_box.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.CROSS_REVERSE))
 
 		#print dicValores
 		return dicValores
@@ -195,11 +202,13 @@ class Aplicacao:
 		for i in dicValidador.keys():
 			if dicValidador[i]:
 			# Destaca a cor do número repedido
-				self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#DF0E0A'))
+				color = "#DF0E0A"
 
 			else:
 			# Cor padrão dos números sem repetições
-				self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#292929'))
+				color = "#292929"
+			
+			self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(color))
 
 	def verificador(self, keys, values):
 		#Verifica a ocorrencia de números repetidos no momento do jogo
@@ -269,13 +278,12 @@ class Aplicacao:
 
 			listaMatrizTMP = listaMatriz
 
-		posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 		inIndex = None
 		quadranteValores = []
 
 		y = 0
 
-		for i in posFix:
+		for i in self.posFix:
 			z = 0
 			quadranteIndex =[]
 
@@ -386,6 +394,7 @@ class Aplicacao:
 	def main(self):
 
 		gtk.main()
+		return 0
 
 if __name__=="__main__":
 	App = Aplicacao()
