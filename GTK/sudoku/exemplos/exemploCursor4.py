@@ -45,9 +45,9 @@ class Cursor():
 		
 
 		self.window.add(self.caixaB)
-		event_box.realize()
 
-		
+
+		event_box.realize()
 		event_box.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.CROSS_REVERSE))
 
 

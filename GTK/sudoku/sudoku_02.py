@@ -17,7 +17,10 @@ class Aplicacao:
 		self.window.set_border_width(10)
 		#self.window.set_size_request(550, 550)
 
+		self.watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+
 		self.posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
+		# Posições iniciais de cada quadrante do jogo
 
 		self.matrizSudoku = self.criarMatriz()
 
@@ -25,7 +28,20 @@ class Aplicacao:
 
 		self.dicValores = self.cria_widgets()
 
+
 		self.window.show_all()
+
+
+		for i in self.dicValores:
+
+			if not self.dicValores[i].get_text():
+				cursor = gtk.gdk.Cursor(gtk.gdk.HAND2) 
+
+			else:
+				cursor = gtk.gdk.Cursor(gtk.gdk.X_CURSOR)
+
+			self.dicValores[i].window.set_cursor(cursor)
+			
 
 	def cria_widgets(self):
 
@@ -35,12 +51,8 @@ class Aplicacao:
 		x = 0
 		y = 0
 
-		# Posições iniciais de cada quadrante do jogo
-		
-
-		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
-	
 		dicValores = {}
+		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
 
 		for quadNumero, i in enumerate(self.posFix):
 
@@ -50,8 +62,8 @@ class Aplicacao:
 			xx = 0
 			yy = 0
 
-			#monta o quadrante
 			quadMontado = []
+			# monta o quadrante
 
 			z = 0
 
@@ -71,8 +83,6 @@ class Aplicacao:
 
 				self.label = gtk.Label()
 
-				# self.event_box.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.HAND1))
-				# Aqui será feito a separação dos quadrantes pela cor
 
 				if quadNumero % 2 == 0:
 				
@@ -113,7 +123,6 @@ class Aplicacao:
 
 					self.label.set_markup("<b>%s</b>" % str(self.matrizSudokuOculta[idNum]))
 					size = pango.AttrSize(20000, 0, 1)
-				
 
 				self.label.set_size_request(40, 40)
 				
@@ -146,11 +155,6 @@ class Aplicacao:
 
 		self.window.add(self.hbox)
 
-		self.event_box.realize()
-
-		self.event_box.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.CROSS_REVERSE))
-
-		#print dicValores
 		return dicValores
 
 	def click_btn(self, widget, event, itemClicado, indexMatriz):
@@ -202,6 +206,7 @@ class Aplicacao:
 		for i in dicValidador.keys():
 			if dicValidador[i]:
 			# Destaca a cor do número repedido
+				
 				color = "#DF0E0A"
 
 			else:
@@ -209,6 +214,8 @@ class Aplicacao:
 				color = "#292929"
 			
 			self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(color))
+
+
 
 	def verificador(self, keys, values):
 		#Verifica a ocorrencia de números repetidos no momento do jogo
