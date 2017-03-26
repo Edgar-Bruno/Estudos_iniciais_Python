@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import threading, gtk,\
-pygtk, commands, subprocess,\
+pygtk, commands,\
 urllib2, os, threading, time, gobject, pango
 
 pygtk.require('2.0')
 
 class  ediThread(threading.Thread):
 	"""docstring for  ediThread"""
+
 	def __init__(self, mainviewEdi):
 		threading.Thread.__init__(self)
 		self.mainviewEdi = mainviewEdi
@@ -18,9 +19,9 @@ class  ediThread(threading.Thread):
 		self.amount_completed = 0
 		gobject.timeout_add(1, self.ativar_barra)
 
-		for i in range(100):
+		for i in range(10):
 			time.sleep(0.15)
-			self.amount_completed += .01
+			self.amount_completed += .1
 
 		self.work_complete = True
 
@@ -33,10 +34,10 @@ class  ediThread(threading.Thread):
 			self.mainviewEdi.barra_progresso.set_text("Completo")
 
 		else:
-			self.mainviewEdi.barra_progresso.set_text("%d%%" % (self.amount_completed * 100))
+			self.mainviewEdi.barra_progresso.set_text("%d%%" % (self.amount_completed * 10))
 			#self.mainviewEdi.textoLabel.set_text("FIM DO barra_progresso")
 
-		return not self.work_complete
+			return not self.work_complete
 	
 
 class BaseY:
@@ -116,7 +117,7 @@ class BaseY:
 		sobre.set_copyright("(c) EDi-Rx")
 		sobre.set_comments("Esse é meu primeiro programa GTK em Python")
 		sobre.set_website("http://edgar.com")
-		sobre.set_logo(gtk.gdk.pixbuf_new_from_file("../camera_icon.jpg"))
+		sobre.set_logo(gtk.gdk.pixbuf_new_from_file("/home/edgarbruno/Pictures/2554bfe42e2f5d12d0e16364dc9d543e.jpg"))
 		sobre.run()
 		sobre.destroy()
 

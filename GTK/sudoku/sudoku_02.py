@@ -9,6 +9,7 @@ pygtk.require('2.0')
 class Aplicacao:
 
 	def __init__(self):
+
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 
 		self.window.set_title("Sudoku")
@@ -17,8 +18,6 @@ class Aplicacao:
 		self.window.set_border_width(10)
 		#self.window.set_size_request(550, 550)
 
-		self.watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
-
 		self.posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 		# Posições iniciais de cada quadrante do jogo
 
@@ -26,22 +25,25 @@ class Aplicacao:
 
 		self.matrizSudokuOculta = self.ocutador()
 
-		self.dicValores = self.cria_widgets()
+		self.dicObjtos = self.cria_widgets()
 
 
 		self.window.show_all()
 
 
-		for i in self.dicValores:
+		for i in self.dicObjtos:
 
-			if not self.dicValores[i].get_text():
+			if not self.dicObjtos[i].get_text():
 				cursor = gtk.gdk.Cursor(gtk.gdk.HAND2) 
 
 			else:
 				cursor = gtk.gdk.Cursor(gtk.gdk.X_CURSOR)
+				self.dicObjtos[i].set_tooltip_text("Não clicavel")
 
-			self.dicValores[i].window.set_cursor(cursor)
-			
+			self.dicObjtos[i].window.set_cursor(cursor)
+		# Solução para alterar o cursor está na documentação
+		# http://faq.pygtk.org/index.py?file=faq05.006.htp&req=edit
+		# http://www.pygtk.org/pygtk2reference/class-gdkcursor.html
 
 	def cria_widgets(self):
 
@@ -51,7 +53,7 @@ class Aplicacao:
 		x = 0
 		y = 0
 
-		dicValores = {}
+		dicObjtos = {}
 		# Dicionário conterá todos os valores para identificar o botão, valor e indice.
 
 		for quadNumero, i in enumerate(self.posFix):
@@ -73,16 +75,14 @@ class Aplicacao:
 					#print "Indice = %d Valor = %d" % (d, self.matrizSudokuOculta[d])
 					# A key do dicionário é o index da matrizSudokuOculta. O Seu valor será o elemento label
 					quadMontado.append(d)
-					dicValores[d] = None
+					dicObjtos[d] = None
 
 				z += 9
 				
 			for idNum in quadMontado:
 
 				self.event_box = gtk.EventBox()
-
 				self.label = gtk.Label()
-
 
 				if quadNumero % 2 == 0:
 				
@@ -95,10 +95,10 @@ class Aplicacao:
 
 					if idNum % 2 == 0:
 
-						color = "#acbcd5"
+						color = "#A4ACB8"
 						# Cor 2 do fundo clicavel
 					else:
-						color = "#c8d0dc"
+						color = "#B8C2CF"
 
 				self.event_box.modify_bg(gtk.STATE_NORMAL,
 					self.event_box.get_colormap().alloc_color(color))
@@ -127,10 +127,10 @@ class Aplicacao:
 				self.label.set_size_request(40, 40)
 				
 				attr.insert(size)
-
+				
 				self.label.set_attributes(attr)
 				
-				dicValores[idNum] = self.label
+				dicObjtos[idNum] = self.label
 
 				self.event_box.add(self.label)
 
@@ -155,7 +155,7 @@ class Aplicacao:
 
 		self.window.add(self.hbox)
 
-		return dicValores
+		return dicObjtos
 
 	def click_btn(self, widget, event, itemClicado, indexMatriz):
 
@@ -201,19 +201,19 @@ class Aplicacao:
 		if True in listaValid:
 			dicValidador[indexMatriz] = True
 
-
 		# Valida a repetição dos números
 		for i in dicValidador.keys():
 			if dicValidador[i]:
 			# Destaca a cor do número repedido
 				
 				color = "#DF0E0A"
+				# self.dicObjtos[i].set_tooltip_text("Repitido")
 
 			else:
 			# Cor padrão dos números sem repetições
 				color = "#292929"
 			
-			self.dicValores[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(color))
+			self.dicObjtos[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(color))
 
 
 
