@@ -35,7 +35,6 @@ class  ediThread(threading.Thread):
 
 		return not self.work_complete
 
-
 class Base:
 
 	def __init__(self):
@@ -48,6 +47,7 @@ class Base:
 		self.window.set_position(gtk.WIN_POS_CENTER)
 
 		self.barra_progresso = gtk.ProgressBar()
+		self.barra_progresso.set_text(" ")
 
 		self.buttonx = gtk.Button("Start")
 
@@ -62,7 +62,7 @@ class Base:
 		hbox.pack_start(self.buttony)
 
 		align = gtk.Alignment(0.5, 0.9, 0.25, 0)
-		alignb = gtk.Alignment(0.5, 0.6, 0, 0.2)
+		alignb = gtk.Alignment(0.5, 0.6, 0, 0.1)
 		# http://www.pygtk.org/pygtk2reference/class-gtkalignment.html
 		# http://amgcomputing.blogspot.pt/2011/12/pygtk-alignment-class.html
 
@@ -84,14 +84,11 @@ class Base:
 		print "Clicado no botão ativar"
 		self.buttonx.set_sensitive(False) # Desabilita botão
 		self.barra_progresso.set_fraction(0)
-
-		worker = ediThread(self, self.contador())
-		print "ALI"
+		worker = ediThread(self)
 		worker.start()
 
-	def contador(self):
+	def contador():
 		print "aqui"
-		return "XXXX"
 
 	def main(self):
 		gtk.main()

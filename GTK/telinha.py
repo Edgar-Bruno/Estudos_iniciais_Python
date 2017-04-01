@@ -20,6 +20,7 @@ class  ediThread(threading.Thread):
 		gobject.timeout_add(1, self.ativar_barra)
 
 		for i in range(10):
+			print "AQUI"
 			time.sleep(0.15)
 			self.amount_completed += .1
 

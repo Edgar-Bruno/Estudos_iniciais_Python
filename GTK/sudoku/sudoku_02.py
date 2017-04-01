@@ -6,7 +6,17 @@ import pygtk, gtk, copy, pango
 from random import randint
 pygtk.require('2.0')
 
-class Aplicacao:
+class ProgressBar:
+
+	def __init__(self):
+		pass
+
+	def main(self):
+		gtk.main()
+		return 0
+		
+
+class SudokuMain(object):
 
 	def __init__(self):
 
@@ -27,9 +37,7 @@ class Aplicacao:
 
 		self.dicObjtos = self.cria_widgets()
 
-
 		self.window.show_all()
-
 
 		for i in self.dicObjtos:
 
@@ -397,12 +405,7 @@ class Aplicacao:
 				listaMatrizOculta[ocultar] = 0
 		
 		return listaMatrizOculta
-		
-	def main(self):
-
-		gtk.main()
-		return 0
 
 if __name__=="__main__":
-	App = Aplicacao()
+	App = ProgressBar()
 	App.main()
