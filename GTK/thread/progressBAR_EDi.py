@@ -54,9 +54,12 @@ class ProgressBar:
 
 	# Update the value of the progress bar so that we get
 	# some movement
-	def progress_timeout(self, pbobj):
+	def progress_timeout(self, pbobj, varX):
 
-		print "ccc ",self.__dict__
+	
+		print " varX   >> ", varX
+		varX += 1
+		#print "ccc ",self.__dict__
 		# Calculate the value of the progress bar using the
 		# value range set in the adjustment object
 		new_val = pbobj.pbar.get_fraction() + 0.1
@@ -82,11 +85,13 @@ class ProgressBar:
 
 		# As this is a timeout function, return TRUE so that it
 		# continues to get called
+
 		return True
 
 	def ativar(self, *args):
 		# Add a timer callback to update the value of the progress bar
-		self.timer = gobject.timeout_add (100, self.progress_timeout, self)
+		varX=0
+		self.timer = gobject.timeout_add (100, self.progress_timeout, self, varX)
 
 		self.window.set_size_request(50, 200)
 

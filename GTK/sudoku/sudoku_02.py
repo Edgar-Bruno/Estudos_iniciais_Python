@@ -2,19 +2,86 @@
 # -*- coding: utf-8 -*-
 
 #Exemplo de jogo SUDOKU
-import pygtk, gtk, copy, pango
 from random import randint
+import pygtk, gtk, copy, pango, gobject
 pygtk.require('2.0')
 
 class ProgressBar:
 
 	def __init__(self):
-		pass
+
+		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.window.set_resizable(True)
+
+		self.window.connect('destroy', lambda w: gtk.main_quit())
+		self.window.set_title("Carregar jogo")
+		self.window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+		self.window.set_border_width(0)
+		vbox = gtk.VBox(False, 5)
+		vbox.set_border_width(10)
+
+		self.buttonStart = gtk.Button("Start")
+		self.buttonStart.connect("clicked", self.ativador)
+		self.buttonStart.set_tooltip_text("Gere um novo jogo")
+		
+		hbox = gtk.HBox(homogeneous=True, spacing=5)
+		
+		hbox.pack_start(self.buttonStart)
+        
+		#Cria o alinhamento dos objetos
+		align = gtk.Alignment(0.5, 0.9, 0.25, 0)
+		alignb = gtk.Alignment(0.7, 0.5, 0, 0)
+
+		align.add(hbox)
+
+		vbox.add(align)
+		vbox.pack_start(alignb, False, False, 5)
+
+		# Cria a ProgressBar
+		self.pBar = gtk.ProgressBar()
+		self.pBar.set_text(" ")
+
+		alignb.add(self.pBar)
+
+		self.window.add(vbox)
+		
+		separator = gtk.HSeparator()
+		vbox.pack_start(separator, False, False, 0)
+
+		self.window.show_all()
+
+		self.numeroSorteado = None
+		self.listaNumeros = [] # Cria uma lista com 11 números após, ser inserida em listaMatriz seu valor é resetado
+		self.listaMatriz = [] # Recebe todos números da listaNumeros
+		self.quebraLoopInfinito = 0 # Mecanismo para impedir loops infinitos
+		self.resetCriaMatriz = 0 # Mecanismo para "resetar" a matriz quando, é, identificado um eventual loop infinito 
+
+	def ativador(self, *args):
+		self.timer = gobject.timeout_add (100, self.criarMatriz)
+
+	def criarMatriz(self):
+
+		self.numeroSorteado = randint(1,9)
+
+		checkRepeti =[] # Recebe booleano de repetição ods números no eixo Y e no quadrante
+
+		checkRepeti.append(SudokuMain.abscissas(self.listaNumeros, len(self.listaNumeros), self.numeroSorteado))
+
+		if True in checkRepeti:
+			print "SIM"
+			return False
+		else:
+			print "Não"
+			addVal = self.pBar.get_fraction() + 0.1
+			self.listaNumeros.append(self.numeroSorteado)
+			self.pBar.set_fraction(addVal)
+
+			print "----- >>>> ", self.listaNumeros
+			return True
 
 	def main(self):
 		gtk.main()
 		return 0
-		
 
 class SudokuMain(object):
 
@@ -24,7 +91,6 @@ class SudokuMain(object):
 
 		self.window.set_title("Sudoku")
 		self.window.connect('destroy', lambda w: gtk.main_quit())
-		self.window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
 		self.window.set_border_width(10)
 		#self.window.set_size_request(550, 550)
 
@@ -245,7 +311,9 @@ class SudokuMain(object):
 
 		return dicVerificador
 
+	@classmethod
 	def abscissas(self, listaMatriz, indexMatriz, numeroSorteado=None, flag=None):
+		print "Entrou "
 		# verifica se há ocorrência de números repetidos no eixo X para montar a matriz do jogo
 		#lado esquerdo
 
