@@ -6,7 +6,7 @@ from random import randint
 import pygtk, gtk, copy, pango, gobject
 pygtk.require('2.0')
 
-class ProgressBar:
+class ProgressBar(object):
 
 	def __init__(self):
 
@@ -50,42 +50,81 @@ class ProgressBar:
 
 		self.window.show_all()
 
-		self.numeroSorteado = None
-		self.listaNumeros = [] # Cria uma lista com 11 números após, ser inserida em listaMatriz seu valor é resetado
-		self.listaMatriz = [] # Recebe todos números da listaNumeros
-		self.quebraLoopInfinito = 0 # Mecanismo para impedir loops infinitos
-		self.resetCriaMatriz = 0 # Mecanismo para "resetar" a matriz quando, é, identificado um eventual loop infinito 
+		self.vaux = False # Flag para evitar loops infinitos
+
+		self.listaSudokuMatrix = None
 
 	def ativador(self, *args):
-		self.timer = gobject.timeout_add (100, self.criarMatriz)
+		self.timer = gobject.timeout_add (1, self.criarMatriz)
+		self.buttonStart.set_sensitive(False) # Desabilita botão
 
 	def criarMatriz(self):
 
-		self.numeroSorteado = randint(1,9)
+		if not self.vaux:
 
-		checkRepeti =[] # Recebe booleano de repetição ods números no eixo Y e no quadrante
+			# self.numeroSorteado = None
+			self.listaNumeros = [] # Cria uma lista com 11 números após, ser inserida em listaSudokuMatrix seu valor é resetado
+			self.listaSudokuMatrix = [] # Recebe todos números validos da listaNumeros a fim de gerar a matriz numérica do jogo
+			self.quebraLoopInfinito = 0 # Mecanismo para impedir loops infinitos
+			self.resetCriaMatriz = 0 # Mecanismo para "resetar" a matriz quando, é, identificado um eventual loop infinito
+			self.vaux = True
+			self.addVal = 0.012345679
+			self.pBar.set_fraction(0)
 
-		checkRepeti.append(SudokuMain.abscissas(self.listaNumeros, len(self.listaNumeros), self.numeroSorteado))
-
-		if True in checkRepeti:
-			print "SIM"
-			return False
 		else:
-			print "Não"
-			addVal = self.pBar.get_fraction() + 0.1
-			self.listaNumeros.append(self.numeroSorteado)
-			self.pBar.set_fraction(addVal)
 
-			print "----- >>>> ", self.listaNumeros
-			return True
+			self.numeroSorteado = randint(1,9)
+
+			checkRepeti = [] # Recebe booleano de repetição ods números no eixo Y e no quadrante
+
+			checkRepeti.append(SudokuMain.abscissas(self.listaNumeros, len(self.listaNumeros), self.numeroSorteado))
+			checkRepeti.append(SudokuMain.ordenadas(self.listaSudokuMatrix, len(self.listaSudokuMatrix) + len(self.listaNumeros), self.numeroSorteado))	
+			checkRepeti.append(SudokuMain.quadrante(self.listaSudokuMatrix, len(self.listaSudokuMatrix) + len(self.listaNumeros), self.numeroSorteado, self.listaNumeros))
+
+			if True in checkRepeti:
+
+				if self.quebraLoopInfinito == 20:
+					self.listaNumeros = []
+					self.quebraLoopInfinito = 0
+					self.resetCriaMatriz += 1
+				
+					if self.resetCriaMatriz == 10:
+						self.vaux = False
+
+				self.quebraLoopInfinito += 1
+				
+			else:
+				self.listaNumeros.append(self.numeroSorteado)
+				self.quebraLoopInfinito = 0
+
+				#self.addVal = ((len(self.listaSudokuMatrix) + len(self.listaNumeros)) * 0.012345679)
+				self.pBar.set_fraction((len(self.listaSudokuMatrix) + len(self.listaNumeros)) * 0.012345679)
+				
+
+				if len(self.listaNumeros) == 9:
+			
+					self.listaSudokuMatrix.extend(self.listaNumeros)
+					self.listaNumeros = []
+
+					#raw_input("Press Enter to continue..."
+
+			if len(self.listaSudokuMatrix) == 81:
+
+				AppS = SudokuMain(self.listaSudokuMatrix)
+				AppS.main()
+				
+				print "AQui, é o fim"
+				return False
+
+		return True
 
 	def main(self):
 		gtk.main()
 		return 0
 
-class SudokuMain(object):
+class SudokuMain(ProgressBar):
 
-	def __init__(self):
+	def __init__(self, progressBar):
 
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 
@@ -97,7 +136,7 @@ class SudokuMain(object):
 		self.posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 		# Posições iniciais de cada quadrante do jogo
 
-		self.matrizSudoku = self.criarMatriz()
+		self.matrizSudoku = progressBar
 
 		self.matrizSudokuOculta = self.ocutador()
 
@@ -290,13 +329,13 @@ class SudokuMain(object):
 			self.dicObjtos[i].modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(color))
 
 
-
+	@classmethod
 	def verificador(self, keys, values):
 		#Verifica a ocorrencia de números repetidos no momento do jogo
 
-		dicVerificador = {} # Key é o index da listaMatriz, value será True ou False
+		dicVerificador = {} # Key é o index da listaSudokuMatrix, value será True ou False
 
-		dictTMP = dict(zip(keys, values)) # Keys é o index e values é o valor da listaMatriz 
+		dictTMP = dict(zip(keys, values)) # Keys é o index e values é o valor da listaSudokuMatrix 
 
 		for i in dictTMP:
 			vTMP = dictTMP[i]	# valor do elemento.
@@ -312,8 +351,7 @@ class SudokuMain(object):
 		return dicVerificador
 
 	@classmethod
-	def abscissas(self, listaMatriz, indexMatriz, numeroSorteado=None, flag=None):
-		print "Entrou "
+	def abscissas(self, listaSudokuMatrix, indexMatriz, numeroSorteado=None, flag=None):
 		# verifica se há ocorrência de números repetidos no eixo X para montar a matriz do jogo
 		#lado esquerdo
 
@@ -324,15 +362,16 @@ class SudokuMain(object):
 
 		if flag:
 		
-			checkRepeti = self.verificador(range(i, i+9), listaMatriz[i:i+9])
+			checkRepeti = self.verificador(range(i, i+9), listaSudokuMatrix[i:i+9])
 
 		else:
 
-			checkRepeti = numeroSorteado in listaMatriz[i:i+9]
+			checkRepeti = numeroSorteado in listaSudokuMatrix[i:i+9]
 
 		return checkRepeti
-	
-	def ordenadas(self, listaMatriz, indexMatriz, numeroSorteado=None, flag=None):
+
+	@classmethod
+	def ordenadas(self, listaSudokuMatrix, indexMatriz, numeroSorteado=None, flag=None):
 		# verifica se há ocorrência de números repetidos no eixo Y
 		#Sobe
 
@@ -342,24 +381,27 @@ class SudokuMain(object):
 		
 		if flag:
 			# List Comprehensions list = [i+x*9 for x in range(9)]
-			checkRepeti = self.verificador([i+x*9 for x in range(9)], listaMatriz[i::9])
+			checkRepeti = self.verificador([i+x*9 for x in range(9)], listaSudokuMatrix[i::9])
 
 		else:
 
-			checkRepeti = numeroSorteado in listaMatriz[i::9]
+			checkRepeti = numeroSorteado in listaSudokuMatrix[i::9]
 
 		return checkRepeti
 
-	def quadrante(self, listaMatriz, indexMatriz, numeroSorteado=None, listaNumeros=None, flag=None):
+	@classmethod
+	def quadrante(self, listaSudokuMatrix, indexMatriz, numeroSorteado=None, listaNumeros=None, flag=None):
 		# Verifica se há ocorrência de números repetidos no quadrante
+
+		self.posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 
 		if listaNumeros:
 
-			listaMatrizTMP = listaMatriz + listaNumeros
+			listaSudokuMatrixTMP = listaSudokuMatrix + listaNumeros
 		
 		else:
 
-			listaMatrizTMP = listaMatriz
+			listaSudokuMatrixTMP = listaSudokuMatrix
 
 		inIndex = None
 		quadranteValores = []
@@ -387,7 +429,7 @@ class SudokuMain(object):
 
 		for i in range(3):
 			
-			quadranteValores.extend(listaMatrizTMP[inIndex+z:inIndex+3+z])
+			quadranteValores.extend(listaSudokuMatrixTMP[inIndex+z:inIndex+3+z])
 			z += 9
 
 		if flag:
@@ -400,65 +442,11 @@ class SudokuMain(object):
 
 		return checkRepeti
 
-	def criarMatriz(self):
-	
-		# Função responsável pela sequência de números para criar o jogo 
-
-		vaux = False
-
-		numeroSorteado = None
-		listaNumeros = [] # Cria uma lista com 11 números após, ser inserida em listaMatriz seu valor é resetado
-		listaMatriz = [] # Recebe todos números da listaNumeros
-		quebraLoopInfinito = 0 # Mecanismo para impedir loops infinitos
-		resetCriaMatriz = 0 # Mecanismo para "resetar" a matriz quando, é, identificado um eventual loop infinito 
-
-		while not vaux:
-			
-			numeroSorteado = randint(1,9)
-	
-			checkRepeti =[] # Recebe booleano de repetição ods números no eixo Y e no quadrante
-			checkRepeti.append(self.abscissas(listaNumeros, len(listaNumeros), numeroSorteado))
-			checkRepeti.append(self.ordenadas(listaMatriz, len(listaMatriz) + len(listaNumeros), numeroSorteado))	
-			checkRepeti.append(self.quadrante(listaMatriz, len(listaMatriz) + len(listaNumeros), numeroSorteado, listaNumeros))
-
-			if True in checkRepeti:
-
-				if quebraLoopInfinito == 20:
-					listaNumeros = []
-					quebraLoopInfinito = 0
-					resetCriaMatriz += 1
-				
-					if resetCriaMatriz == 10:
-						vaux = True
-
-				quebraLoopInfinito += 1
-
-			else:
-
-				listaNumeros.append(numeroSorteado)
-				quebraLoopInfinito = 0
-
-				if len(listaNumeros) == 9:
-
-					listaMatriz.extend(listaNumeros)
-					listaNumeros = []
-
-					if len(listaMatriz) is 81:
-
-						# Finzalia o while ao atingir a quantidade de números necessários para criar o jogo
-						vaux = True
-
-		while not len(listaMatriz) == 81:
-		# Faz a segunda conferência da listaMatriz
-			listaMatriz = self.criarMatriz()
-
-		return listaMatriz
-
 	def ocutador(self):
 		
 		#Função responsável por ocultar os números da matrizSudoku
 
-		listaMatrizOculta = copy.copy(self.matrizSudoku)
+		listaSudokuMatrixOculta = copy.copy(self.matrizSudoku)
 
 		listaOcultados = []
 
@@ -470,9 +458,13 @@ class SudokuMain(object):
 			if not ocultar in listaOcultados:
 				listaOcultados.append(ocultar)
 
-				listaMatrizOculta[ocultar] = 0
+				listaSudokuMatrixOculta[ocultar] = 0
 		
-		return listaMatrizOculta
+		return listaSudokuMatrixOculta
+
+	def main(self):
+		gtk.main()
+		return 0
 
 if __name__=="__main__":
 	App = ProgressBar()
