@@ -45,8 +45,8 @@ class BaseY:
 
     
 	def destroy(self, widget, data=None):
-		print "Voce saiu do programa!!!"
 		gtk.main_quit()
+		print "Voce saiu do programa!!!"
 
 	def esconder(self, widget):
 		print "Ola Edgar !!!"

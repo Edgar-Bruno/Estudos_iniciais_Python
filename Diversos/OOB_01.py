@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-class Employee:
+class Employee():
+
+	raise_amt = 1.04
 
 	def __init__(self, fname, lname, pay):
 		self.fname = fname
@@ -12,13 +14,28 @@ class Employee:
 	def fullName(self):
 		return '{} {}'.format(self.fname, self.lname)
 
-emp_1 = Employee('Edgar', 'Bruno', 152400) # Instacia da classe Employee
+	def appli_raise(self):
+		self.pay = int(self.pay * self.raise_amt)
 
-print (Employee.fullName(Employee('Vivi', 'Nicolao', 572400))) # Acessando a classe Employee diretamente
 
-print (emp_1.email)
+class Developer(Employee):
 
-"""emp_2 = Employee()
+	def __init__(self, fname, lname, pay, prog_lang):
+		super().__init__(fname, lname, pay)
+		#Employee.__init__(self, fname, lname, pay) # Herança
+		self.prog_lang = prog_lang
+
+
+dev = Developer('Edgar', 'Bruno', 152400, 'Python') # Instacia da classe Employee
+emp2 = Employee('Vivi', 'Nicolao', 572400)
+
+#print (Employee.fullName(Employee('Vivi', 'Nicolao', 572400))) # Acessando a classe Employee diretamente
+
+print (dev.prog_lang)
+print (emp2.fname)
+"""
+
+emp_2 = Employee()
 
 emp_2.fname = 'Vivi'
 emp_2.lname = 'Nicolao'
