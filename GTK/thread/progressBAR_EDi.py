@@ -11,6 +11,7 @@ class ProgressBar:
 
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.set_resizable(True)
+		self.window.set_size_request(300, 300)
 
 		self.window.connect('destroy', lambda w: gtk.main_quit())
 		self.window.set_title("ProgressBar")
@@ -65,6 +66,7 @@ class ProgressBar:
 		new_val = pbobj.pbar.get_fraction() + 0.1
 		if new_val > 1.0:
 			new_val = 0
+			self.window.set_size_request(100, 100)
 			return False
 		else:
 			print B.b1(self.x) # => 'Hello from class A'
@@ -93,7 +95,7 @@ class ProgressBar:
 		varX=0
 		self.timer = gobject.timeout_add (100, self.progress_timeout, self, varX)
 
-		self.window.set_size_request(50, 200)
+		self.window.set_size_request(500, 500)
 
 	def main(self):
 		gtk.main()

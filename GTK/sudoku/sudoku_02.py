@@ -1,32 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Exemplo de jogo SUDOKU
+# Jogo Sudoku
+# Objetivo desse programa em Python 2 é o estudo e testes da lingagem.
+
 from random import randint
 import pygtk, gtk, copy, pango, gobject
 pygtk.require('2.0')
 
-class CriaMatriz(object):
+class MontarJogo(object):
 
 	def __init__(self):
 
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.set_resizable(True)
-
-		self.create_widgets()
-
-		self.window.connect('destroy', lambda w: gtk.main_quit())
-		self.window.set_title("Carregar jogo")
 		self.window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-		self.window.set_border_width(0)
+		self.window.connect("destroy", self.destroy)
 
+		self.cria_widget()
+		
 		self.window.show_all()
 
 		self.vaux = False # Flag para evitar loops infinitos
 
 		self.listaSudokuMatrix = None
 
-	def create_widgets(self):
+	def cria_widget(self):
+
+		self.window.set_resizable(True)
+		self.window.set_title("Carregar jogo")
+		self.window.set_border_width(0)
 
 		vbox = gtk.VBox(False, 5)
 		vbox.set_border_width(10)
@@ -36,11 +38,11 @@ class CriaMatriz(object):
 		self.buttonStart = gtk.Button("Start")
 		self.buttonStart.connect("clicked", self.ativador)
 		self.buttonStart.set_tooltip_text("Gere um novo jogo")
-		
+			
 		hbox = gtk.HBox(homogeneous=True, spacing=5)
-		
+			
 		hbox.pack_start(self.buttonStart)
-        
+	        
 		#Cria o alinhamento dos objetos
 		align = gtk.Alignment(0.5, 0.9, 0.25, 0)
 		alignb = gtk.Alignment(0.7, 0.5, 0, 0)
@@ -56,23 +58,22 @@ class CriaMatriz(object):
 
 		alignb.add(self.pBar)
 
-		
 		separator = gtk.HSeparator()
-		
+			
 		vbox.pack_start(separator, False, False, 0)
-
-
 		vbox.pack_start(self.textoLabel)
 
-		self.window.add(vbox)
+		self.window.add(vbox) 
 
 
 	def ativador(self, *args):
+
 		self.timer = gobject.timeout_add (1, self.geradorMatriz)
 		self.buttonStart.set_sensitive(False) # Desabilita botão
+		self.buttonStart.set_tooltip_text("Jogo sendo gerado")
 
 	def geradorMatriz(self):
-
+		# Definição responsável por gerar a matriz numérica válida para montar o jogo
 
 		if not self.vaux:
 
@@ -90,9 +91,10 @@ class CriaMatriz(object):
 
 			checkRepeti = [] # Recebe booleano de repetição ods números no eixo Y e no quadrante
 
-			checkRepeti.append(MontarJogo.abscissas(self.listaNumeros, len(self.listaNumeros), self.numeroSorteado))
-			checkRepeti.append(MontarJogo.ordenadas(self.listaSudokuMatrix, len(self.listaSudokuMatrix) + len(self.listaNumeros), self.numeroSorteado))	
-			checkRepeti.append(MontarJogo.quadrante(self.listaSudokuMatrix, len(self.listaSudokuMatrix) + len(self.listaNumeros), self.numeroSorteado, self.listaNumeros))
+			checkRepeti.append(RegrasJogo.abscissas(self.listaNumeros, len(self.listaNumeros), self.numeroSorteado))
+			checkRepeti.append(RegrasJogo.ordenadas(self.listaSudokuMatrix, len(self.listaSudokuMatrix) + len(self.listaNumeros), self.numeroSorteado))	
+			checkRepeti.append(RegrasJogo.quadrante(self.listaSudokuMatrix, len(self.listaSudokuMatrix) + len(self.listaNumeros), self.numeroSorteado, self.listaNumeros))
+			# 
 
 			if True in checkRepeti:
 
@@ -122,48 +124,74 @@ class CriaMatriz(object):
 
 			if len(self.listaSudokuMatrix) == 81:
 
-				AppS = MontarJogo(self.listaSudokuMatrix)
+				self.window.destroy()
+
+				AppS = RegrasJogo(self.ocutador())
 				AppS.main()
 				
 				return False
 
 		return True
 
+	def ocutador(self):
+		
+		#Função responsável por ocultar os números da listaSudokuMatrix
+
+		listaSudokuMatrixOculta = copy.copy(self.listaSudokuMatrix)
+
+		qtdOculta = randint(40, 60)
+
+		listaOcultados = []
+
+		while not len(listaOcultados) == qtdOculta:
+		# Quantidade limite de números ocultados
+
+			ocultar = randint(0,80)
+
+			if not ocultar in listaOcultados:
+				listaOcultados.append(ocultar)
+
+				listaSudokuMatrixOculta[ocultar] = 0
+		
+		return listaSudokuMatrixOculta
+
+	def destroy(self, widget, data=None):
+		# definição para fechar a tela de carregamento do jogo
+			gtk.main_quit()
+
 	def main(self):
 
 		gtk.main()
 		return 0
 
-class MontarJogo(object):
+class RegrasJogo(object):
 
-	def __init__(self, matrizSudoku):
+	def __init__(self, listaSudokuMatrix):
 
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
 
 		self.window.set_title("Sudoku")
 		self.window.connect('destroy', lambda w: gtk.main_quit())
 		self.window.set_border_width(10)
-		#self.window.set_size_request(550, 550)
-		
+
+		self.posFix = [0, 3 , 6 , 27, 30, 33, 54, 57, 60]
 		# Posições iniciais de cada quadrante do jogo
 
-		self.matrizSudoku = matrizSudoku
-
-		self.matrizSudokuOculta = self.ocutador()
+		self.matrizSudokuOculta = listaSudokuMatrix
 
 		self.dicObjtos = self.cria_widgets()
 
 		self.window.show_all()
 
 		for i in self.dicObjtos:
-
+						
 			if not self.dicObjtos[i].get_text():
 				cursor = gtk.gdk.Cursor(gtk.gdk.HAND2) 
-
 			else:
 				cursor = gtk.gdk.Cursor(gtk.gdk.X_CURSOR)
 				self.dicObjtos[i].set_tooltip_text("Não clicavel")
-
+						
 			self.dicObjtos[i].window.set_cursor(cursor)
 		# Solução para alterar o cursor está na documentação
 		# http://faq.pygtk.org/index.py?file=faq05.006.htp&req=edit
@@ -171,8 +199,8 @@ class MontarJogo(object):
 
 	def cria_widgets(self):
 
-		self.hbox = gtk.HBox(False, 0)
-		self.table = gtk.Table(3,3, gtk.TRUE)
+		hbox = gtk.HBox(False, 0)
+		table = gtk.Table(3,3, gtk.TRUE)
 
 		x = 0
 		y = 0
@@ -182,8 +210,8 @@ class MontarJogo(object):
 
 		for quadNumero, i in enumerate(self.posFix):
 
-			self.table_b = gtk.Table(3,3, gtk.TRUE)
-			self.frame = gtk.Frame()
+			table_b = gtk.Table(3,3, gtk.TRUE)
+			frame = gtk.Frame()
 	
 			xx = 0
 			yy = 0
@@ -205,8 +233,8 @@ class MontarJogo(object):
 				
 			for idNum in quadMontado:
 
-				self.event_box = gtk.EventBox()
-				self.label = gtk.Label()
+				event_box = gtk.EventBox()
+				label = gtk.Label()
 
 				if quadNumero % 2 == 0:
 				
@@ -224,53 +252,53 @@ class MontarJogo(object):
 					else:
 						color = "#B8C2CF"
 
-				self.event_box.modify_bg(gtk.STATE_NORMAL,
-					self.event_box.get_colormap().alloc_color(color))
+				event_box.modify_bg(gtk.STATE_NORMAL,
+					event_box.get_colormap().alloc_color(color))
 
 				attr = pango.AttrList()
 				
 				if self.matrizSudokuOculta[idNum] == 0:
 					
-					self.label.set_text("")
-					self.event_box.connect("button_press_event", self.click_btn, self.label, idNum)
+					label.set_text("")
+					event_box.connect("button_press_event", self.click_btn, label, idNum)
 					size = pango.AttrSize(15000, 0, 1)
 
 				else:
 					# Cor da fonte não clicavel
 
-					self.label.set_markup("<b>%s</b>" % str(self.matrizSudokuOculta[idNum]))
+					label.set_markup("<b>%s</b>" % str(self.matrizSudokuOculta[idNum]))
 					size = pango.AttrSize(20000, 0, 1)
 
-				self.label.set_size_request(40, 40)
+				label.set_size_request(40, 40)
 				
 				attr.insert(size)
 				
-				self.label.set_attributes(attr)
+				label.set_attributes(attr)
 				
-				dicObjtos[idNum] = self.label
+				dicObjtos[idNum] = label
 
-				self.event_box.add(self.label)
+				event_box.add(label)
 
-				self.event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
+				event_box.set_events(gtk.gdk.BUTTON_PRESS_MASK)
 
-				self.table_b.attach(self.event_box, xx, xx+1, yy, yy+1, xpadding=1, ypadding=1)
+				table_b.attach(event_box, xx, xx+1, yy, yy+1, xpadding=1, ypadding=1)
 
 				xx += 1
 				if xx > 2:
 					xx = 0
 					yy += 1
 
-			self.frame.add(self.table_b)
-			self.table.attach(self.frame, x, x+1, y, y+1, xpadding=2, ypadding=2)
+			frame.add(table_b)
+			table.attach(frame, x, x+1, y, y+1, xpadding=2, ypadding=2)
 
 			x += 1
 			if x > 2:
 				x = 0
 				y += 1
 
-		self.hbox.pack_start(self.table, True, False, 50)
+		hbox.pack_start(table, True, False, 50)
 
-		self.window.add(self.hbox)
+		self.window.add(hbox)
 
 		return dicObjtos
 
@@ -446,32 +474,10 @@ class MontarJogo(object):
 
 		return checkRepeti
 
-	def ocutador(self):
-		
-		#Função responsável por ocultar os números da matrizSudoku
-
-		listaSudokuMatrixOculta = copy.copy(self.matrizSudoku)
-
-		qtdOculta = randint(40, 60)
-
-		listaOcultados = []
-
-		while not len(listaOcultados) == qtdOculta:
-		# Quantidade limite de números ocultados
-
-			ocultar = randint(0,80)
-
-			if not ocultar in listaOcultados:
-				listaOcultados.append(ocultar)
-
-				listaSudokuMatrixOculta[ocultar] = 0
-		
-		return listaSudokuMatrixOculta
-
 	def main(self):
 		gtk.main()
 		return 0
 
 if __name__=="__main__":
-	App = CriaMatriz()
+	App = MontarJogo()
 	App.main()

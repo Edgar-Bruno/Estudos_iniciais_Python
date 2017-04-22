@@ -33,6 +33,7 @@ class  ediThread(threading.Thread):
 
 		if self.work_complete:
 			self.mainviewEdi.barra_progresso.set_text("Completo")
+			self.janelinha.set_size_request(1000, 1000)
 
 		else:
 			self.mainviewEdi.barra_progresso.set_text("%d%%" % (self.amount_completed * 10))
@@ -83,8 +84,8 @@ class BaseY:
 
 	def limparTXT(self, widget):
 		self.textoEntrada.set_text("")
-	
-		os.system("apt-get -y purge gedit")
+		self.janelinha.set_size_request(900, 900)
+		# os.system("apt-get -y purge gedit")
 		#teste = popen("sudo apt-get purge gedit")
 
 	def comboBox_text(self, widget):
@@ -102,15 +103,16 @@ class BaseY:
 
 
 	def baixar_img(self, widget):
-		
-		figura = urllib2.urlopen('http://all.hu/tux.jpg')
-		img = open("salvar.png", "w")
-		img.write(figura.read())
-		img.close()
-		os.system("apt-get -y install gedit")
+		self.Expander.set_size_request(750, 750)
+		#figura = urllib2.urlopen('http://all.hu/tux.jpg')
+		#img = open("salvar.png", "w")
+		#img.write(figura.read())
+		#img.close()
+		#os.system("apt-get -y install gedit")
 
 	def infoSobre(self, widget):
 		self.barra_progresso.set_text("Virginia Bruno")
+		self.Expander.set_size_request(650, 650)
 
 		sobre = gtk.AboutDialog()
 		sobre.set_program_name("Meu Primeiro Programa")
@@ -136,6 +138,11 @@ class BaseY:
 		#self.aquiSanji = aquiSanji
 		self.janelinha = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.janelinha.set_position(gtk.WIN_POS_CENTER)
+		self.Expander=gtk.Expander()
+		self.Expander.set_expanded(True)
+
+		self.Expander.set_size_request(100,400)
+
 		self.janelinha.set_size_request(500, 500)
 
 		self.janelinha.set_title("Titulo do programinha INICIO")
@@ -283,6 +290,7 @@ class BaseY:
 		self.janelinha.add(self.caixaB)
 
 		self.janelinha.show_all()
+		self.Expander.show()
 		self.janelinha.connect("destroy", self.destroy)
 
 	def main(self):
