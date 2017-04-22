@@ -6,17 +6,28 @@ from random import randint
 import pygtk, gtk, copy, pango, gobject
 pygtk.require('2.0')
 
-class ProgressBar(object):
+class CriaMatriz(object):
 
 	def __init__(self):
 
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.window.set_resizable(True)
 
+		self.create_widgets()
+
 		self.window.connect('destroy', lambda w: gtk.main_quit())
 		self.window.set_title("Carregar jogo")
 		self.window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
 		self.window.set_border_width(0)
+
+		self.window.show_all()
+
+		self.vaux = False # Flag para evitar loops infinitos
+
+		self.listaSudokuMatrix = None
+
+	def create_widgets(self):
+
 		vbox = gtk.VBox(False, 5)
 		vbox.set_border_width(10)
 
@@ -39,7 +50,7 @@ class ProgressBar(object):
 		vbox.add(align)
 		vbox.pack_start(alignb, False, False, 5)
 
-		# Cria a ProgressBar
+		# Cria a CriaMatriz
 		self.pBar = gtk.ProgressBar()
 		self.pBar.set_text(" ")
 
@@ -55,17 +66,12 @@ class ProgressBar(object):
 
 		self.window.add(vbox)
 
-		self.window.show_all()
-
-		self.vaux = False # Flag para evitar loops infinitos
-
-		self.listaSudokuMatrix = None
 
 	def ativador(self, *args):
-		self.timer = gobject.timeout_add (1, self.criarMatriz)
+		self.timer = gobject.timeout_add (1, self.geradorMatriz)
 		self.buttonStart.set_sensitive(False) # Desabilita botão
 
-	def criarMatriz(self):
+	def geradorMatriz(self):
 
 
 		if not self.vaux:
@@ -84,9 +90,9 @@ class ProgressBar(object):
 
 			checkRepeti = [] # Recebe booleano de repetição ods números no eixo Y e no quadrante
 
-			checkRepeti.append(SudokuMain.abscissas(self.listaNumeros, len(self.listaNumeros), self.numeroSorteado))
-			checkRepeti.append(SudokuMain.ordenadas(self.listaSudokuMatrix, len(self.listaSudokuMatrix) + len(self.listaNumeros), self.numeroSorteado))	
-			checkRepeti.append(SudokuMain.quadrante(self.listaSudokuMatrix, len(self.listaSudokuMatrix) + len(self.listaNumeros), self.numeroSorteado, self.listaNumeros))
+			checkRepeti.append(MontarJogo.abscissas(self.listaNumeros, len(self.listaNumeros), self.numeroSorteado))
+			checkRepeti.append(MontarJogo.ordenadas(self.listaSudokuMatrix, len(self.listaSudokuMatrix) + len(self.listaNumeros), self.numeroSorteado))	
+			checkRepeti.append(MontarJogo.quadrante(self.listaSudokuMatrix, len(self.listaSudokuMatrix) + len(self.listaNumeros), self.numeroSorteado, self.listaNumeros))
 
 			if True in checkRepeti:
 
@@ -116,7 +122,7 @@ class ProgressBar(object):
 
 			if len(self.listaSudokuMatrix) == 81:
 
-				AppS = SudokuMain(self.listaSudokuMatrix)
+				AppS = MontarJogo(self.listaSudokuMatrix)
 				AppS.main()
 				
 				return False
@@ -128,9 +134,9 @@ class ProgressBar(object):
 		gtk.main()
 		return 0
 
-class SudokuMain(ProgressBar):
+class MontarJogo(object):
 
-	def __init__(self, progressBar):
+	def __init__(self, matrizSudoku):
 
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 
@@ -141,7 +147,7 @@ class SudokuMain(ProgressBar):
 		
 		# Posições iniciais de cada quadrante do jogo
 
-		self.matrizSudoku = progressBar
+		self.matrizSudoku = matrizSudoku
 
 		self.matrizSudokuOculta = self.ocutador()
 
@@ -446,9 +452,11 @@ class SudokuMain(ProgressBar):
 
 		listaSudokuMatrixOculta = copy.copy(self.matrizSudoku)
 
+		qtdOculta = randint(40, 60)
+
 		listaOcultados = []
 
-		while not len(listaOcultados) == 50:
+		while not len(listaOcultados) == qtdOculta:
 		# Quantidade limite de números ocultados
 
 			ocultar = randint(0,80)
@@ -465,5 +473,5 @@ class SudokuMain(ProgressBar):
 		return 0
 
 if __name__=="__main__":
-	App = ProgressBar()
+	App = CriaMatriz()
 	App.main()

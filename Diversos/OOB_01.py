@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-class Employee():
+class Employee(object):
 
 	raise_amt = 1.04
 
@@ -21,7 +21,9 @@ class Employee():
 class Developer(Employee):
 
 	def __init__(self, fname, lname, pay, prog_lang):
-		super().__init__(fname, lname, pay)
+		super(Developer, self).__init__(fname, lname, pay)
+		# Solução explicada em :
+		# http://stackoverflow.com/questions/222877/what-does-super-do-in-python
 		#Employee.__init__(self, fname, lname, pay) # Herança
 		self.prog_lang = prog_lang
 
