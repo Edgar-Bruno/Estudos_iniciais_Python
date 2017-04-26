@@ -5,7 +5,7 @@
 # Objetivo desse programa em Python 2 é o estudo e testes da lingagem.
 
 from random import randint
-import pygtk, gtk, copy, pango, gobject
+import pygtk, gtk, copy, pango, gobject, time
 pygtk.require('2.0')
 
 class MontarJogo(object):
@@ -33,8 +33,6 @@ class MontarJogo(object):
 		vbox = gtk.VBox(False, 5)
 		vbox.set_border_width(10)
 
-		self.textoLabel = gtk.Label("TEXTO DA LABEL")
-
 		self.buttonStart = gtk.Button("Start")
 		self.buttonStart.connect("clicked", self.ativador)
 		self.buttonStart.set_tooltip_text("Gere um novo jogo")
@@ -61,7 +59,6 @@ class MontarJogo(object):
 		separator = gtk.HSeparator()
 			
 		vbox.pack_start(separator, False, False, 0)
-		vbox.pack_start(self.textoLabel)
 
 		self.window.add(vbox) 
 
@@ -87,7 +84,6 @@ class MontarJogo(object):
 		else:
 
 			self.numeroSorteado = randint(1,9)
-			self.textoLabel.set_text(str(self.listaNumeros))
 
 			checkRepeti = [] # Recebe booleano de repetição ods números no eixo Y e no quadrante
 
@@ -114,6 +110,8 @@ class MontarJogo(object):
 
 				#self.addVal = ((len(self.listaSudokuMatrix) + len(self.listaNumeros)) * 0.012345679)
 				self.pBar.set_fraction((len(self.listaSudokuMatrix) + len(self.listaNumeros)) * 0.012345679)
+				self.pBar.set_text("{:.0f}".format((len(self.listaSudokuMatrix) + len(self.listaNumeros)) / 0.81))
+				#Exibição da porcentagem na progressbar
 				
 				if len(self.listaNumeros) == 9:
 			
